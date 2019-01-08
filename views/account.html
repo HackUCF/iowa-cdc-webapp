@@ -1,0 +1,11 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<h1>M/(r|s|iss)/ {{account.owner}}'s Account details</h1>
+<form action="/account/{{account.account_number}}" method="post">
+    <div class="form-group">
+        <input class="form-control" type="number" id="bal" placeholder="{{account.amount}}">
+    </div>
+    <button class="btn btn-primary" type="submit">Update</button>
+</form>
+<script>console.log(JSON.stringify({{account | string}}, null, 4))</script>
+{% endblock %}

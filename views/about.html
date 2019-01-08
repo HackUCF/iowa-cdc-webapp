@@ -1,0 +1,36 @@
+{% extends "skeleton.html" %}
+{% block body %}
+
+<h2>Our illustrious history</h2>
+<p>The {{global.settings.strings.bank_name}} was founded in 1917 by the great party of the USSR.</p>
+<p>Not only are we the best choice for all your banking needs, we are the only one!</p>
+<p>Look at what everyone has to say!</p>
+<hr>
+<pre>{{ comments | safe | nl2br}}</pre>
+<hr>
+<p>Don't like these? Try another option!</p>
+<div class="btn-group">
+    <a href="/about/propaganda" class="btn btn-danger">Propaganda</a>
+    <a href="/about/comments" class="btn btn-warning">Comments</a>
+</div>
+<hr>
+<div>
+    <form action="/about" method="post">
+        <div class="form-group">
+            <label for="set">What set does this belong to?</label>
+        <select class="form-control" id="set" name="set">
+            <option>comments</option>
+            <option>propaganda</option>
+        </select>
+        </div><div class="form-group">
+        <label for="uname">Your username</label>
+        <input name="uname" id="uname" placeholder="Username" type="text" class="form-control">
+    </div><div class="form-group">
+        <label for="comment">What would you like to say?</label>
+        <textarea name="comment" id="comment" class="form-control"></textarea>
+    </div>
+        <button class="btn btn-danger" type="submit">Submit</button>
+    </form>
+</div>
+
+{% endblock %}

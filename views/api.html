@@ -1,0 +1,14 @@
+{% extends "skeleton.html" %}
+{% block body %}
+{% for ep in routes %}
+<a style="display:block; text-decoration: none; color: inherit" href="api/{{ep.link}}">
+    <div style="font-family: Consolas;">
+        <h2>{{ep.name}}</h2>
+        <h3>{{ep.type}}</h3>
+        <p style="color: red">{{ep.desc}}</p>
+        <code>{{ep.link}}</code>
+        <hr color="red">
+    </div>
+</a>
+{% endfor %}
+{% endblock %}

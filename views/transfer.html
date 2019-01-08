@@ -1,0 +1,19 @@
+{% extends "skeleton.html" %}
+{% block body %}
+
+<form action="/admin/transfer" method="post">
+    <div class="form-group">
+        <input class="form-control" type="number" placeholder=" Source Account Number" name="account_number">
+        <input class="form-control" type="number" placeholder="Amount" name="amount">
+        <input class="form-control" type="number" placeholder="PIN Number" name="pin">
+    </div>
+    <div class="form-group">
+        <input class="form-control" type="number" placeholder="Destination Branch Number" name="dbranch" min="1" max="40">
+        <input class="form-control" type="number" placeholder="Amount" name="dacct">
+    </div>
+    <div class="form-group">
+        <button class="btn btn-lg btn-primary" type="submit">Submit</button>
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<h1>That was not very kind of you brother.</h1>
+<!--<code>{{ error | striptags(true) | escape | nl2br }}</code>-->
+<code>{{ error | safe | nl2br}}</code>
+{% endblock %}
