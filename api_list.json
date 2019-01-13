@@ -1,0 +1,22 @@
+{
+  "endpoints": [
+    {
+      "mane": "Add funds",
+      "type": "POST",
+      "desc": "This is where you add to an accounts balance. To subtract, just add a negative!",
+      "link": "pos/add"
+    },
+    {
+      "mane": "Get account balance",
+      "type": "GET",
+      "desc": "This is where you retrieve an accounts balance. The desired account number should be the last argument. For example, '/api/pos/balance/12345' would return account 12345's balance.",
+      "link": "pos/balance"
+    },
+    {
+      "mane": "Transfer funds",
+      "type": "POST",
+      "desc": "This is where you transfer funds. You should really make sure you know what you're doing here.",
+      "link": "pos/transfer"
+    }
+  ]
+}

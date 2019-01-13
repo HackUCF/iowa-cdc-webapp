@@ -1,0 +1,39 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<!--<audio id="my_audio" src="/assets/international.mp3" loop="loop"></audio>-->
+<audio autoplay loop>
+    <source src="/assets/international.mp3" type="audio/mpeg">
+</audio>
+<h1 style="text-align: center">Greetings Comrade!</h1>
+<br><br>
+<h3 style="text-align: center">What would you like to do?</h3>
+<br>
+<div class="btn-block" style="align-content: center;text-align: center">
+    <div>
+        <a href="/admin/newAccount" class="btn btn-primary">Create a new account</a>
+        <br>
+        <br>
+        <br>
+    </div>
+    <div>
+        <a href="/admin/transfer" class="btn btn-primary">Transfer funds</a>
+        <br>
+        <br>
+        <br>
+    </div>
+    <div>
+        <a href="/admin/add" class="btn btn-primary">Add/withdraw funds</a>
+        <br>
+        <br>
+        <br>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{ super() }}
+<!--<script>-->
+<!--$(document).ready(function() {-->
+<!--$("#my_audio").get(0).play();-->
+<!--});-->
+<!--</script>-->
+{% endblock %}
