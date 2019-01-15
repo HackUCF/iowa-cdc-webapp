@@ -16,7 +16,6 @@ client.captureStackTraces = true;
 client.connect().then(logger.info('Client Connected')).catch(reason => {
     logger.error(reason)
 });
-var references = ["Sounding the Seventh Trumpet", "Waking the Fallen", "City of Evil", "Avenged Sevenfold", "Nightmare", "Hail to the King", "HAIL TO THE KING: DEATHBAT – ORIGINAL VIDEO GAME SOUNDTRACK", "The Stage", "LIVE AT THE GRAMMY MUSEUM®", "The Stage: Deluxe Edition", "Black Reign"]
 
 module.exports.checkconn = function checkConnection() {
     if (!client.isConnected()) {
@@ -26,7 +25,7 @@ module.exports.checkconn = function checkConnection() {
 
 module.exports.syn = function () {
     try {
-        logger.debug("HAIL TO THE KING " + new Date().toISOString());
+        logger.debug("Initializing: " + new Date().toISOString());
         getUpstream(function () {
             doTransfers();
             doAdds();
@@ -78,7 +77,7 @@ function doTransfers() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'transfers', function () {
-            logger.info(randomItem(references));
+            logger.info("");
         })
     });
     stream.on('data', record => {
@@ -105,7 +104,7 @@ function doAdds() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'adds', function () {
-            logger.info(randomItem(references));
+            logger.info("");
         })
     });
     stream.on('data', record => {
