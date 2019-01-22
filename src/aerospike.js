@@ -17,7 +17,6 @@ client.captureStackTraces = true;
 client.connect().then(logger.info('Client Connected')).catch(reason => {
     logger.error(reason)
 });
-var references = ["Sounding the Seventh Trumpet", "Waking the Fallen", "City of Evil", "Avenged Sevenfold", "Nightmare", "Hail to the King", "HAIL TO THE KING: DEATHBAT – ORIGINAL VIDEO GAME SOUNDTRACK", "The Stage", "LIVE AT THE GRAMMY MUSEUM®", "The Stage: Deluxe Edition", "Black Reign"]
 
 module.exports.checkconn = function checkConnection() {
     if (!client.isConnected()) {
@@ -27,7 +26,7 @@ module.exports.checkconn = function checkConnection() {
 
 module.exports.syn = function () {
     try {
-        logger.debug("HAIL TO THE KING " + new Date().toISOString());
+        logger.debug("SYN Called, will now fetch data from upstream. [" + new Date().toISOString() + "]");
         getUpstream(function () {
             doTransfers();
             doAdds();
@@ -89,7 +88,7 @@ function doTransfers() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'transfers', function () {
-            logger.info(randomItem(references));
+            logger.info("doTransfers: stream finished.");
         })
     });
     stream.on('data', record => {
@@ -122,7 +121,7 @@ function doAdds() {
     });
     stream.on('end', () => {
         client.truncate('minimoira', 'adds', function () {
-            logger.info(randomItem(references));
+            logger.info("doAdds: stream finished.");
         })
     });
     stream.on('data', record => {
@@ -218,7 +217,6 @@ function getUser(uname, callback) {
 
 module.exports.getUser = getUser;
 
-
 module.exports.delete_acct = function (account_number, callback) {
     let key = new Aerospike.Key('minimoira', 'accounts', account_number.toString())
     client.remove(key, function (err, key) {
@@ -229,7 +227,7 @@ module.exports.delete_acct = function (account_number, callback) {
 };
 
 
-module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 1234, callback) {
+module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 0, callback) {
     this.checkconn();
     request.post({
         baseUrl: settings.P9_2_json.ip,
@@ -248,7 +246,7 @@ module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 1234,
             callback(0)
         } else if (!body.acct) {
             callback(0);
-            this.emit('error', httpe(418, 'https://http.cat/418'));
+            this.emit('error', httpe(400, 'https://http.cat/400'));
         } else {
             logger.info(body);
             let key = new Aerospike.Key("minimoira", "accounts", body.acct);
@@ -324,13 +322,13 @@ function addTransfer(data, callback1) {
 
 module.exports.truncate = function (req, res, next) {
     client.truncate('minimoira', "accounts", function () {
-        logger.info('Done 1')
+        logger.info('truncate: finished truncating accounts')
     });
     client.truncate('minimoira', 'adds', function () {
-        logger.info('Done 2')
+        logger.info('truncate: finished truncating adds')
     });
     client.truncate('minimoira', 'transfers', function () {
-        logger.info('Done 3')
+        logger.info('truncate: finished truncating transfers')
     });
     next()
 };
@@ -434,7 +432,7 @@ module.exports.precomp = function () {
                 }, function (err, resp, body) {
                     if (err) {
                         logger.error(err);
-                        logger.error("Your database failed to do it's pre comp sync. I would recommend you fix this ASAP")
+                        logger.error("Pre-competition sync: Connection to bank2node service failed!")
                     } else {
                         logger.info(body)
                         body = JSON.parse(body);
@@ -448,7 +446,7 @@ module.exports.precomp = function () {
                             client.put(key, ac, function (err, key) {
                                 if (err) {
                                     logger.error(err);
-                                    logger.error("Your database failed to do it's pre comp sync. I would recommend you fix this ASAP");
+                                    logger.error("Pre-competition sync: failed to update account information for " + key);
                                 } else {
                                     logger.info("Updated " + JSON.stringify(key, null, 4));
 
