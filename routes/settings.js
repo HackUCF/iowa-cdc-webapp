@@ -1,11 +1,10 @@
 let router = require('express').Router();
 
 router.get('/', function (req, res, next) {
-    res.json(settings)
+    res.json({})
 });
 router.post('/', function (req, res, next) {
-    settings = req.body;
-    res.json(settings)
+    res.json({})
 });
 
 module.exports=router;
