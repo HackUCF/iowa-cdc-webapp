@@ -6,7 +6,7 @@ const as = require('../src/aerospike');
 router.get('/balance/:acct/', function (req, res, next) {
     let acct = req.params.acct;
     as.getAccount(acct, function (err, dat) {
-        dat.balance = dat.amount;
+        //dat.balance = dat.amount;
         res.json(dat)
     });
 });
@@ -15,7 +15,7 @@ router.get("/balance", function (req, res, nexr) {
     s.recieved = req.body;
     s.message = "This is the over-sharing endpoint";
     s.balances = [];
-    as.getAllAccounts(function (err, all) {
+    /*as.getAllAccounts(function (err, all) {
         for (i of Object.keys(all)){
             s.balances.push({
                 balance: all[i].bins.amount,
@@ -24,7 +24,8 @@ router.get("/balance", function (req, res, nexr) {
 
         }
         res.json(s)
-    })
+    })*/
+    res.json(s)
 });
 router.post('/add', function (req, res, next) {
     let s = {};
