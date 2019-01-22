@@ -5,7 +5,7 @@ let as = require('../src/aerospike');
 router.post('/', function (req, res, next) {
     as.addComment(function () {
 res.redirect('/about/'+req.body.set)
-    }, req.body.set || "comments", req.body)
+    }, "comments", req.body)
 });
 
 router.get('/:set?', function (req, res, next) {
