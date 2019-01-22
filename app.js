@@ -50,7 +50,7 @@ var usersRouter = require('./routes/users');
 let search_router = require('./routes/search');
 let api_router = require("./routes/api");
 app.use('/', indexRouter);
-app.use('/search', search_router.search());
+// app.use('/search', search_router.search());
 app.use('/users', usersRouter);
 app.use('/api', api_router);
 app.use('/test', require('./routes/test'));
