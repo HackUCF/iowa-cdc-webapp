@@ -20,7 +20,9 @@ global.logger = winston.createLogger({
 });
 
 var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
-settings.lm = function(){return "";};
+var lm = {};
+lm.phrase = function(){return "";};
+settings.lm = lm;
 
 let as = require('./src/aerospike');
 var indexRouter = require('./routes/index');
@@ -78,14 +80,9 @@ app.use(function (err, req, res, next) {
         stack: err.stack
     }, null, 4))
     res.status(err.status || 450);
-    logger.error((lm.phrase()))
     res.render('error.html', {
         settings: settings,
-        error: JSON.stringify({
-            level: err.level,
-            message: err.message,
-            stack: err.stack
-        }, null, 4).replace(/\\n/g, '\<br \/\>')
+        error: ""
     });
 });
 
