@@ -1,7 +1,15 @@
+var path = require('path');
+var express = require('express');
+let fs = require('fs');
+const nunjucks = require("nunjucks");
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var createError = require('http-errors');
+let winston = require('winston');
+var app_logger = require('morgan');
+
 global.settings = require('./settings');
 global.as_settings = require('./as_settings');
-var lm = require("loader-message");
-let winston = require('winston');
 global.logger = winston.createLogger({
     level: 'silly',
     format: winston.format.json(),
@@ -10,45 +18,33 @@ global.logger = winston.createLogger({
         new winston.transports.File({filename: './logs/combined.log'})
     ]
 });
-var createError = require('http-errors');
-var express = require('express');
-var app = express();
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var app_logger = require('morgan');
-const nunjucks = require("nunjucks");
-let fs = require('fs');
+
+var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
+settings.lm = function(){return "";};
+
 let as = require('./src/aerospike');
-app.use('/truncate', as.truncate);
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: winston.format.combine(winston.format.colorize(), winston.format.simple())
-    }));
-}
-logger.debug(JSON.stringify(settings, null, 4));
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+let search_router = require('./routes/search');
+let api_router = require("./routes/api");
+let init = require("./src/init_session");
+
+var app = express();
+
 let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {watch: true}), {
-    autoescape: false,
+    autoescape: true,
     trimBlocks: true,
     lstripBlocks: true
 });
-njenv.addGlobal("settings", settings)
-    .express(app);
-logger.info(JSON.stringify(njenv.getGlobal("settings")));
+njenv.addGlobal("settings", settings).express(app);
 
-var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
-settings.lm = lm.phrase()
 app.use(app_logger('common', {stream: logStream}));
 app.use(app_logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-let init = require("./src/init_session");
 app.use(init);
 app.use(express.static(path.join(__dirname, '/public')));
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-let search_router = require('./routes/search');
-let api_router = require("./routes/api");
 app.use('/', indexRouter);
 app.use('/search', search_router.search());
 app.use('/users', usersRouter);
@@ -61,10 +57,17 @@ app.use('/schedule', require('./routes/sched'));
 app.use('/account', require('./routes/account'));
 app.use('/about', require('./routes/about'));
 app.use('/settings', require('./routes/settings'));
+app.use('/truncate', as.truncate);
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.combine(winston.format.colorize(), winston.format.simple())
+    }));
+}
+
 app.use(function (req, res, next) {
     next(createError(404));
 });
-logger.info(lm.phrase())
+
 app.use(function (err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = err;
@@ -85,4 +88,5 @@ app.use(function (err, req, res, next) {
         }, null, 4).replace(/\\n/g, '\<br \/\>')
     });
 });
+
 module.exports = app;
