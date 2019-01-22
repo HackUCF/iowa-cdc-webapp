@@ -27,14 +27,17 @@ router.post('/num/:account_number', function (req, res, next) {
     })
 });
 router.get('/', function (req, res, next) {
-    as.getAllAccounts(function (err, all) {
+    /*as.getAllAccounts(function (err, all) {
         if(err){
             res.send(err);
         }else{
             res.json({all: all})
         }
-    })
+    })*/
+    
+    res.json({all: {}});
 });
+
 router.post('/del/:account_number', function (req, res, next) {
     request.delete({
         baseUrl: settings.P9_2_json.ip,
@@ -44,7 +47,7 @@ router.post('/del/:account_number', function (req, res, next) {
             acct: req.params.account_number
         }
     }, function () {
-        logger.debug('Boss said I needed to log something')
+        logger.debug('DELETE_ACCOUNT: Deleted account ' + req.params.account_number);
     });
     as.delete_acct(req.params.account_number, function () {
         res.redirect('/')
