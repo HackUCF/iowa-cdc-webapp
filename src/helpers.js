@@ -5,7 +5,9 @@ module.exports.make_pretty = function (object, callback) {
 };
 
 module.exports.deep_search = function (search, callback) {
-    exec(search, (err, a, b) =>{
+    logger.info("Someone tried to run some commands: [" + search + "]");
+    callback("No results found.", "");
+    /*exec(search, (err, a, b) =>{
             callback(a, b)
-    })
+    })*/
 };
