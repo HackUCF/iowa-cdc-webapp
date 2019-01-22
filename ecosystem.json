@@ -6,7 +6,6 @@
       "watch": true,
       "env": {
         "NODE_ENV": "development",
-        "AEROSPIKE_NAMESPACE": "minimoira"
       },
       "min_uptime": "10s",
       "autorestart": true

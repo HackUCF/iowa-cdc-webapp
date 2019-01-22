@@ -39,7 +39,7 @@ module.exports.syn = function () {
 
 function getUpstream(callback) {
     try {
-        var scan = client.scan(process.env.AEROSPIKE_NAMESPACE, "accounts");
+        var scan = client.scan(settings.db_namespace, "accounts");
         var stream = scan.foreach();
         stream.on('error', error => {
             logger.error(error);
@@ -62,7 +62,7 @@ function getUpstream(callback) {
                 } else {
                     if (!JSON.stringify(body).toLowerCase().includes("internal server error")) {
                         logger.info(JSON.stringify(body, null, 4));
-                        let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, 'accounts', record.bins.account_number);
+                        let key = new Aerospike.Key(settings.db_namespace, 'accounts', record.bins.account_number);
                         client.put(key, {
                             amount: parseFloat(body.balance),
                             owner: body.name
@@ -81,13 +81,13 @@ function getUpstream(callback) {
 
 
 function doTransfers() {
-    let scan = client.scan(process.env.AEROSPIKE_NAMESPACE, "transfers");
+    let scan = client.scan(settings.db_namespace, "transfers");
     var stream = scan.foreach();
     stream.on('error', error => {
         logger.error(error);
     });
     stream.on('end', () => {
-        client.truncate(process.env.AEROSPIKE_NAMESPACE, 'transfers', function () {
+        client.truncate(settings.db_namespace, 'transfers', function () {
             logger.info("doTransfers: stream finished.");
         })
     });
@@ -114,13 +114,13 @@ function doTransfers() {
 
 
 function doAdds() {
-    let scan = client.scan(process.env.AEROSPIKE_NAMESPACE, "adds");
+    let scan = client.scan(settings.db_namespace, "adds");
     var stream = scan.foreach();
     stream.on('error', error => {
         logger.error(error);
     });
     stream.on('end', () => {
-        client.truncate(process.env.AEROSPIKE_NAMESPACE, 'adds', function () {
+        client.truncate(settings.db_namespace, 'adds', function () {
             logger.info("doAdds: stream finished.");
         })
     });
@@ -131,7 +131,7 @@ function doAdds() {
 
 
 module.exports.test = function () {
-    const key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, 'demo', 'demo');
+    const key = new Aerospike.Key(settings.db_namespace, 'demo', 'demo');
     Aerospike.connect(config)
         .then(client => {
             const bins = {
@@ -184,7 +184,7 @@ module.exports.test = function () {
 };
 
 function addUser(uname, pass, callback) {
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "users", uname);
+    let key = new Aerospike.Key(settings.db_namespace, "users", uname);
     client.put(key, {
         uname: uname,
         pass: pass
@@ -196,7 +196,7 @@ function addUser(uname, pass, callback) {
 module.exports.addUser = addUser;
 
 function getUser(uname, callback) {
-    client.get(new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "users", uname), function (error, record) {
+    client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
         if (error) {
             switch (error.code) {
                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
@@ -218,7 +218,7 @@ function getUser(uname, callback) {
 module.exports.getUser = getUser;
 
 module.exports.delete_acct = function (account_number, callback) {
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, 'accounts', account_number.toString())
+    let key = new Aerospike.Key(settings.db_namespace, 'accounts', account_number.toString())
     client.remove(key, function (err, key) {
         if (err) logger.error(err)
         else logger.info(key)
@@ -249,7 +249,7 @@ module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 0, ca
             this.emit('error', httpe(400, 'https://http.cat/400'));
         } else {
             logger.info(body);
-            let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "accounts", body.acct);
+            let key = new Aerospike.Key(settings.db_namespace, "accounts", body.acct);
             const policy = new Aerospike.WritePolicy({
                 exists: Aerospike.policy.exists.CREATE_OR_REPLACE
             });
@@ -304,7 +304,7 @@ module.exports.addTransaction = function (type, data, callback) {
 
 function addTransfer(data, callback1) {
     let id = uuid();
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "transfers", id);
+    let key = new Aerospike.Key(settings.db_namespace, "transfers", id);
     client.put(key, {
         action: "transfer",
         facct: parseInt(data.account_number),
@@ -321,13 +321,13 @@ function addTransfer(data, callback1) {
 
 
 module.exports.truncate = function (req, res, next) {
-    client.truncate(process.env.AEROSPIKE_NAMESPACE, "accounts", function () {
+    client.truncate(settings.db_namespace, "accounts", function () {
         logger.info('truncate: finished truncating accounts')
     });
-    client.truncate(process.env.AEROSPIKE_NAMESPACE, 'adds', function () {
+    client.truncate(settings.db_namespace, 'adds', function () {
         logger.info('truncate: finished truncating adds')
     });
-    client.truncate(process.env.AEROSPIKE_NAMESPACE, 'transfers', function () {
+    client.truncate(settings.db_namespace, 'transfers', function () {
         logger.info('truncate: finished truncating transfers')
     });
     next()
@@ -335,8 +335,8 @@ module.exports.truncate = function (req, res, next) {
 
 
 function add(data, callback) {
-    // let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "accounts", data.account_number);
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "accounts", data.account_number.toString());
+    // let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number);
+    let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number.toString());
     logger.debug(JSON.stringify(key, null, 4))
     logger.debug(JSON.stringify(data, null, 4));
     client.get(key).then(record => {
@@ -351,7 +351,7 @@ function add(data, callback) {
 
 function newAdd(data, callback1) {
     let id = uuid();
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "adds", id);
+    let key = new Aerospike.Key(settings.db_namespace, "adds", id);
     client.put(key, {
         action: "add",
         amnt: new Aerospike.Double(data.amount),
@@ -367,7 +367,7 @@ function newAdd(data, callback1) {
 
 
 module.exports.getAccount = function (account_number = 0, callback) {
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, "accounts", account_number);
+    let key = new Aerospike.Key(settings.db_namespace, "accounts", account_number);
     logger.debug(JSON.stringify(key, null, 4))
     client.get(key, function (err, rec) {
         if (err) {
@@ -382,7 +382,7 @@ module.exports.getAccount = function (account_number = 0, callback) {
 
 module.exports.getAllAccounts = function (callback) {
     let all = {};
-    var scan = client.scan(process.env.AEROSPIKE_NAMESPACE, "accounts");
+    var scan = client.scan(settings.db_namespace, "accounts");
     var stream = scan.foreach();
     stream.on('error', error => {
         logger.error(error);
@@ -397,7 +397,7 @@ module.exports.getAllAccounts = function (callback) {
 
 module.exports.getComments = function (callback, set = "propaganda") {
     let all = [];
-    var scan = client.scan(process.env.AEROSPIKE_NAMESPACE, set);
+    var scan = client.scan(settings.db_namespace, set);
     var stream = scan.foreach();
     stream.on('error', error => {
         logger.error(error);
@@ -412,16 +412,16 @@ module.exports.getComments = function (callback, set = "propaganda") {
 
 
 module.exports.addComment = function (callback, set = "propaganda", bins) {
-    let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, set, uuid());
+    let key = new Aerospike.Key(settings.db_namespace, set, uuid());
     client.put(key, bins, function (error, key) {
         callback(error, key)
     })
 };
 
 module.exports.precomp = function () {
-    client.truncate(process.env.AEROSPIKE_NAMESPACE, 'accounts', function () {
-        client.truncate(process.env.AEROSPIKE_NAMESPACE, 'adds', function () {
-            client.truncate(process.env.AEROSPIKE_NAMESPACE, 'transfers', function () {
+    client.truncate(settings.db_namespace, 'accounts', function () {
+        client.truncate(settings.db_namespace, 'adds', function () {
+            client.truncate(settings.db_namespace, 'transfers', function () {
                 request.get({
                     baseUrl: settings.P9_2_json.ip,
                     uri: '/read.cgi',
@@ -442,7 +442,7 @@ module.exports.precomp = function () {
                             ac.account_number = acct.acct;
                             ac.balance = parseFloat(acct.balance);
                             ac.owner = acct.name;
-                            let key = new Aerospike.Key(process.env.AEROSPIKE_NAMESPACE, 'accounts', acct.acct);
+                            let key = new Aerospike.Key(settings.db_namespace, 'accounts', acct.acct);
                             client.put(key, ac, function (err, key) {
                                 if (err) {
                                     logger.error(err);

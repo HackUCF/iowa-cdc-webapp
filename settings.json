@@ -6,6 +6,7 @@
   },
   "title": "Communist Depository Corpus",
   "flag": "FLAG_DATA_HERE",
+  "db_namespace": "minimoira",
   "P9_2_json": {
     "ip": "http://10.0.112.250:8080",
     "port": 8080
