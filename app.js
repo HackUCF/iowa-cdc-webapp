@@ -19,7 +19,6 @@ var app_logger = require('morgan');
 const nunjucks = require("nunjucks");
 let fs = require('fs');
 let as = require('./src/aerospike');
-require('ip_serializer');
 app.use('/truncate', as.truncate);
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({

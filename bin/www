@@ -6,7 +6,6 @@
 
 var app = require('../app');
 var debug = require('debug')('untitled:server');
-require('ip_serializer');
 var http = require('http');
 
 /**
