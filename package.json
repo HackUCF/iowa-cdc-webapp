@@ -12,7 +12,8 @@
   "license": "MIT",
   "author": "TheToddLuci0 <noreply@iseage.org> (https://www.iseage.org)",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "lint": "argulint ./*.js"
   },
   "engines": {
     "npm": "^6.4.0",
@@ -31,11 +32,13 @@
     "express": "^4.16.4",
     "flop": "^6.0.1",
     "fs": "0.0.1-security",
+    "funnies": "^2.0.0",
     "gritty": "^4.3.6",
     "http-errors": "^1.7.1",
     "ip": "^1.1.5",
     "ip_serializer": "^1.0.1",
     "jquery": "^3.3.1",
+    "loader-message": "^2.0.2",
     "morgan": "^1.9.1",
     "multer": "^1.4.1",
     "net": "^1.0.2",
@@ -49,11 +52,13 @@
     "random-item": "^1.0.0",
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
+    "trolld": "^1.0.2",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.16.0",
+    "argulint": "^0.2.1",
     "chokidar": "^2.0.4"
   }
 }

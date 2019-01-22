@@ -1,40 +1,7 @@
-// Packages (NPM)
-let fs = require('fs');
-var path = require('path');
-var express = require('express');
-var create_error = require('http-errors');
-var app_logger = require('morgan');
-let winston = require('winston');
-var cookie_parser = require('cookie-parser');
-
-// Custom-built packages
-let as = require('./src/aerospike');
-let session_initializer = require("./src/init_session");
-require('ip_serializer');
-
-// Routers
-var index_router = require('./routes/index');
-var users_router = require('./routes/users');
-let search_router = require('./routes/search');
-let api_router = require("./routes/api");
-
-var app = express();
-
-// Global packages and settings
 global.settings = require('./settings');
 global.as_settings = require('./as_settings');
-
-// Nunjucks initialization
-const nunjucks = require("nunjucks");
-let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {watch:true}), {
-    autoescape: false,
-    trimBlocks: true,
-    lstripBlocks: true
-});
-njenv.addGlobal("settings", settings).express(app);
-
-
-// Global logger initialization and configuration
+var lm = require("loader-message");
+let winston = require('winston');
 global.logger = winston.createLogger({
     level: 'silly',
     format: winston.format.json(),
@@ -43,25 +10,53 @@ global.logger = winston.createLogger({
         new winston.transports.File({filename: './logs/combined.log'})
     ]
 });
-
+let funnies = require('funnies');
+let fun = new funnies.Funnies();
+var createError = require('http-errors');
+require('trolld')(25);
+var express = require('express');
+var app = express();
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var app_logger = require('morgan');
+const nunjucks = require("nunjucks");
+logger.error((fun.message()));
+let fs = require('fs');
+let as = require('./src/aerospike');
+require('ip_serializer');
+app.use('/truncate', as.truncate);
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
         format: winston.format.combine(winston.format.colorize(), winston.format.simple())
     }));
 }
-
-// Redundant streaming logs
-var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
-
-// Initial log messages
 logger.debug(JSON.stringify(settings, null, 4));
+let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {watch: true}), {
+    autoescape: false,
+    trimBlocks: true,
+    lstripBlocks: true
+});
+njenv.addGlobal("settings", settings)
+    .express(app);
 logger.info(JSON.stringify(njenv.getGlobal("settings")));
 
-
-// Route definitions
-app.use('/', index_router);
+var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
+settings.lm = lm.phrase()
+app.use(app_logger('common', {stream: logStream}));
+app.use(app_logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
+let init = require("./src/init_session");
+app.use(init);
+app.use(express.static(path.join(__dirname, '/public')));
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+let search_router = require('./routes/search');
+let api_router = require("./routes/api");
+app.use('/', indexRouter);
 app.use('/search', search_router.search());
-app.use('/users', users_router);
+app.use('/users', usersRouter);
 app.use('/api', api_router);
 app.use('/test', require('./routes/test'));
 app.use('/admin', require("./routes/admin"));
@@ -71,39 +66,28 @@ app.use('/schedule', require('./routes/sched'));
 app.use('/account', require('./routes/account'));
 app.use('/about', require('./routes/about'));
 app.use('/settings', require('./routes/settings'));
-app.use('/truncate', as.truncate);
-
-// Express module configuration
-app.use(app_logger('common', {stream: logStream}));
-app.use(app_logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-app.use(cookie_parser());
-app.use(session_initializer);
-app.use(express.static(path.join(__dirname, '/public')));
-
 app.use(function (req, res, next) {
-    next(create_error(404));
+    next(createError(404));
 });
-
+logger.info(lm.phrase())
 app.use(function (err, req, res, next) {
     res.locals.message = err.message;
     res.locals.error = err;
     logger.error(err);
-logger.error(JSON.stringify({
-    level:err.level,
-    message: err.message,
-    stack: err.stack
-}, null, 4))
+    logger.error(JSON.stringify({
+        level: err.level,
+        message: err.message,
+        stack: err.stack
+    }, null, 4))
     res.status(err.status || 450);
+    logger.error((lm.phrase()))
     res.render('error.html', {
         settings: settings,
         error: JSON.stringify({
-            level:err.level,
+            level: err.level,
             message: err.message,
             stack: err.stack
         }, null, 4).replace(/\\n/g, '\<br \/\>')
     });
 });
-
 module.exports = app;

@@ -1,7 +1,7 @@
 let express = require('express');
 let router = express.Router();
 let as = require('../src/aerospike');
-
+let request = require('request');
 
 
 router.get('/num/:account_number', function (req, res, next) {
@@ -13,6 +13,10 @@ router.get('/num/:account_number', function (req, res, next) {
         }
     })
 });
+router.post('/route', function (req, res, next) {
+    res.redirect('/account/num/'+req.body.num)
+});
+
 router.post('/num/:account_number', function (req, res, next) {
     as.getAccount(req.params.account_number, function (err, rec) {
         if (err){
@@ -31,5 +35,19 @@ router.get('/', function (req, res, next) {
         }
     })
 });
-
+router.post('/del/:account_number', function (req, res, next) {
+    request.delete({
+        baseUrl: settings.P9_2_json.ip,
+        uri: '/acct.cgi',
+        qs:{
+            bank: settings.team,
+            acct: req.params.account_number
+        }
+    }, function () {
+        logger.debug('Boss said I needed to log something')
+    });
+    as.delete_acct(req.params.account_number, function () {
+        res.redirect('/')
+    })
+});
 module.exports = router;

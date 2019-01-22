@@ -1,0 +1,11 @@
+{% extends "skeleton.html" %}
+{% block body %}
+
+<form action="/account/route" method="post">
+    <input class="form-control" type="number" placeholder="0" name="num">
+    <div class="form-group">
+        <button class="btn btn-lg btn-primary" type="submit">Submit</button>
+    </div>
+</form>
+
+{% endblock %}

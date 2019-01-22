@@ -1,5 +1,6 @@
 {% extends "skeleton.html" %}
 {% block body %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <h1>M/(r|s|iss)/ {{account.owner}}'s Account details</h1>
 <form action="/account/{{account.account_number}}" method="post">
     <div class="form-group">
@@ -7,5 +8,7 @@
     </div>
     <button class="btn btn-primary" type="submit">Update</button>
 </form>
-<script>console.log(JSON.stringify({{account | string}}, null, 4))</script>
+<form action="/account/del/{{account.account_number}}" method="post">
+    <input type="submit" name="upvote" value="Push me for a good time!l" class="btn btn-danger" />
+</form>
 {% endblock %}
