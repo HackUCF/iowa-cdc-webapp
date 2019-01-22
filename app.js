@@ -10,17 +10,13 @@ global.logger = winston.createLogger({
         new winston.transports.File({filename: './logs/combined.log'})
     ]
 });
-let funnies = require('funnies');
-let fun = new funnies.Funnies();
 var createError = require('http-errors');
-require('trolld')(25);
 var express = require('express');
 var app = express();
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var app_logger = require('morgan');
 const nunjucks = require("nunjucks");
-logger.error((fun.message()));
 let fs = require('fs');
 let as = require('./src/aerospike');
 require('ip_serializer');
