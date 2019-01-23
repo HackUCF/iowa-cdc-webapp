@@ -188,40 +188,40 @@ module.exports.test = function () {
 // TODO Add passport.js hooks for db auth of users.
 //      As a result, the following should be deprecated
 
-function addUser(uname, pass, callback) {
-    let key = new Aerospike.Key(settings.db_namespace, "users", uname);
-    client.put(key, {
-        uname: uname,
-        pass: pass
-    }).then(record => {
-        callback(record)
-    }).catch(error => logger.error(error))
-}
+// function addUser(uname, pass, callback) {
+//     let key = new Aerospike.Key(settings.db_namespace, "users", uname);
+//     client.put(key, {
+//         uname: uname,
+//         pass: pass
+//     }).then(record => {
+//         callback(record)
+//     }).catch(error => logger.error(error))
+// }
 
-// Why is this separate? Why not export the original function?
-module.exports.addUser = addUser;
+// // Why is this separate? Why not export the original function?
+// module.exports.addUser = addUser;
 
-function getUser(uname, callback) {
-    client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
-        if (error) {
-            switch (error.code) {
-                case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, "cdc", function () {
-                        getUser(uname, function (res) {
-                            callback(res)
-                        })
-                    });
-                    break;
-                default:
-                    console.log('ERR - ', error, key)
-            }
-        } else {
-            callback(record)
-        }
-    })
-}
+// function getUser(uname, callback) {
+//     client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
+//         if (error) {
+//             switch (error.code) {
+//                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
+//                     addUser(uname, "cdc", function () {
+//                         getUser(uname, function (res) {
+//                             callback(res)
+//                         })
+//                     });
+//                     break;
+//                 default:
+//                     console.log('ERR - ', error, key)
+//             }
+//         } else {
+//             callback(record)
+//         }
+//     })
+// }
 
-module.exports.getUser = getUser;
+// module.exports.getUser = getUser;
 
 module.exports.delete_acct = function (account_number, callback) {
     let key = new Aerospike.Key(settings.db_namespace, 'accounts', account_number.toString())
@@ -355,6 +355,26 @@ function add(data, callback) {
     }).catch(e => {
         logger.error(JSON.stringify(e, null, 4))
     })
+}
+
+
+module.exports.authenticate = function (username, password, done) {
+    client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
+        //If DB Error
+        if (err) {
+            return done(err);
+        }
+        // If use does not exist / User not found
+        if (!user) {
+            return done(null, false);
+        }
+        // If invalid password
+        if (user.password != password) {
+            return done(null, false);
+        }
+        // Else user is good to go. Authenticated
+        return done(null, user);
+    });
 }
 
 
