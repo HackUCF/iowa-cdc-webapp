@@ -60,6 +60,8 @@ function getUpstream(callback) {
                 if (error) {
                     logger.error(error)
                 } else {
+                    // Can we possibly change this to work on request status code?
+                    // I feel like this isn't a great way to distinguish errors
                     if (!JSON.stringify(body).toLowerCase().includes("internal server error")) {
                         logger.info(JSON.stringify(body, null, 4));
                         let key = new Aerospike.Key(settings.db_namespace, 'accounts', record.bins.account_number);
@@ -183,6 +185,9 @@ module.exports.test = function () {
         });
 };
 
+// TODO Add passport.js hooks for db auth of users.
+//      As a result, the following should be deprecated
+
 function addUser(uname, pass, callback) {
     let key = new Aerospike.Key(settings.db_namespace, "users", uname);
     client.put(key, {
@@ -193,6 +198,7 @@ function addUser(uname, pass, callback) {
     }).catch(error => logger.error(error))
 }
 
+// Why is this separate? Why not export the original function?
 module.exports.addUser = addUser;
 
 function getUser(uname, callback) {
@@ -226,7 +232,9 @@ module.exports.delete_acct = function (account_number, callback) {
     })
 };
 
-
+// TODO Figure out how to work this in with passport
+//      When we make a new user with passport, we also
+//      have to create a new bank account with the bank
 module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 0, callback) {
     this.checkconn();
     request.post({
@@ -334,6 +342,7 @@ module.exports.truncate = function (req, res, next) {
 };
 
 
+// TODO Uh.. That's not a great callback. What is this used for?
 function add(data, callback) {
     // let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number);
     let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number.toString());
@@ -418,6 +427,7 @@ module.exports.addComment = function (callback, set = "propaganda", bins) {
     })
 };
 
+// We can call this prior to competition.
 module.exports.precomp = function () {
     client.truncate(settings.db_namespace, 'accounts', function () {
         client.truncate(settings.db_namespace, 'adds', function () {
