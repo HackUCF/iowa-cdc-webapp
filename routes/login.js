@@ -6,8 +6,13 @@ let as = require('../src/aerospike');
 var Recaptcha = require('express-recaptcha').Recaptcha;
 recaptcha = new Recaptcha("6LeXUIwUAAAAAMDSKM4DsbEW7V0e05BcA7df1bv7", "6LeXUIwUAAAAAE-J4bfyCM9hw9M4o6a1McdWIGFd", {'theme':'dark'});
 
-router.get('/', passport.authenticate('local', {successRedirect: '/'}), function (req, res, next) {
+router.get('/',function (req, res, next) {
+    if(req.isAuthenticated()){
+        res.redirect('/')
+    }
+    else{
         res.render('login.html', {settings: settings, captcha:recaptcha.render()})
+    }
 });
 
 router.post('/', passport.authenticate('local', {failureRedirect: '/'}), function (req, res, next) {
