@@ -2,57 +2,65 @@
 // (c) 2019 Charlton Trezevant
 // MIT License
 
-var bans = {};
+// Defaults: Max of 3 attempts within a 5 second window
 var MAX_ATTEMPTS = 3;
-var BAN_LENGTH = 3;
+var BAN_LENGTH = 5;
 
-function newBan(){
-  return {
-    attempts: 1,
-    banTime: new Date()
+var bans = {};
+
+function createNewBanRecord(user){
+  bans[user] = {
+    attempts: 0,
+    firstFailTime: new Date()
   };
 }
 
-function getBanTimeElapsed(user){
+function banRecordExists(user){
+  return bans[user];
+}
+
+function deleteBanRecord(user){
+  delete bans[user];
+}
+
+function banTimeElapsed(user){
+  if(!banRecordExists(user))
+    return 0;
+    
   currentTime = new Date();
-  return Math.floor((currentTime - bans[key(user)].firstFailTime) / 1000);
+  return Math.floor((currentTime - bans[user].firstFailTime) / 1000);
 }
 
-function getBan(user){
-  return bans[key(user)];
-}
+function numAttemptsRecorded(user){
+  if(!banRecordExists(user))
+    return 0;
 
-function createResetBan(user){
-  bans[key(user)] = newBan();
-}
-
-function banAttempts(user){
-  return bans[key(user)].attempts;
+  return bans[user].attempts;
 }
 
 function incrementAttempts(user){
-  bans[key(user)].attempts++;
+  if(!banRecordExists(user))
+    createNewBanRecord(user);
+  
+  bans[user].attempts++;
 }
 
 function isBanned(user){
-  if(!getBan(user)) {
-		createResetBan(user);
-    return false;
-	}
+  if(banTimeElapsed(user) >= BAN_LENGTH)
+    deleteBanRecord(user);
   
-  if(banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) >= BAN_LENGTH){
-    createResetBan(user);
-    return false;
-  }
+  if(numAttemptsRecorded(user) >= MAX_ATTEMPTS)
+    return true;
   
-  if(banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) < BAN_LENGTH){
-    incrementAttempts(user);
-		return true;
-	}
-  
+  return false;
+}
+
+function checkAttempt(user){
 	incrementAttempts(user);
+  return isBanned(user);
 }
 
 module.exports.max_attempts = MAX_ATTEMPTS;
 module.exports.ban_length = BAN_LENGTH;
 module.exports.isBanned = isBanned;
+module.exports.checkAttempt = isBanned;
