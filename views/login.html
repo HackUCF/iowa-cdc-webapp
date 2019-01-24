@@ -1,7 +1,7 @@
 {% extends "skeleton.html" %}
 {% block body %}
-{% if failed %}
-<h1>That seemed a bit <i>un-Soviet</i> of you comrade</h1>
+{% if message %}
+{{ message }}
 {% endif %}
 <form action="/login" method="post">
     <div class="form-group">

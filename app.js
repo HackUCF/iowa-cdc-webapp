@@ -30,6 +30,7 @@ var usersRouter = require('./routes/users');
 let search_router = require('./routes/search');
 let api_router = require("./routes/api");
 let init = require("./src/init_session");
+var flash = require('connect-flash');
 
 var app = express();
 
@@ -71,6 +72,7 @@ passport.serializeUser(function(user, cb) {
 // session.
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 app.use(app_logger('common', {
     stream: logStream

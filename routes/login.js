@@ -8,14 +8,14 @@ recaptcha = new Recaptcha("6LeXUIwUAAAAAMDSKM4DsbEW7V0e05BcA7df1bv7", "6LeXUIwUA
 
 router.get('/',function (req, res, next) {
     if(req.isAuthenticated()){
-        res.redirect('/')
+        res.redirect('/');
     }
     else{
         res.render('login.html', {settings: settings, captcha:recaptcha.render()})
     }
 });
 
-router.post('/', passport.authenticate('local', {failureRedirect: '/'}), function (req, res, next) {
+router.post('/', passport.authenticate('local', {successRedirect : '/', failureRedirect: '/login', badRequestMessage: 'That seemed a bit un-Soviet of you, comrade.', failureFlash: true}), function (req, res, next) {
   recaptcha.verify(req, function(error, data){
     if (!req.recaptcha.error) {
         logger.info("User " + req.body.uname + " successfully logged in and completed the captcha at [" + new Date().toISOString() + "]");
