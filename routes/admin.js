@@ -4,23 +4,26 @@ var passport = require('passport')
 let as = require('../src/aerospike');
 
 
-router.get('/', passport.authenticate('local', { failureRedirect: '/login' }),
-  function (req, res, next) {
-      res.render("admin.html", {settings:settings})
-      res.render("admin.html", {settings: settings});
-});
+router.get('/', passport.authenticate('local', {errorRedirect: '/login'}),
+    function (req, res, next) {
+        res.render("admin.html", {settings: settings});
+    }
+);
 
 router.get('/newAccount', function (req, res, next) {
     res.render('newAccount.html', {settings: settings})
 });
+
 router.post('/newAccount', function (req, res, next) {
     as.newAccount(req.body.account_number, req.body.owner, req.body.bal, req.body.pin, (acct) => {
         res.redirect("/account/num/" + acct)
     });
 });
+
 router.get('/add', function (req, res, next) {
     res.render('add.html', {settings: settings})
 });
+
 router.post('/add', function (req, res, next) {
     as.addTransaction("add", req.body, function (err, result) {
         if (err) {

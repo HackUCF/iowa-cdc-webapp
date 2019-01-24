@@ -371,7 +371,7 @@ module.exports.authenticate = function (username, password, done) {
             return done(null, false);
         }
         // If invalid password
-        if (user.password != password) {
+        if (user['bins'].b != password) {
             logger.error("Invalid password for " + id + " at [" + new Date().toISOString() + "]");
             return done(null, false);
         }
@@ -381,6 +381,11 @@ module.exports.authenticate = function (username, password, done) {
     });
 }
 
+module.exports.getUser = function (username, callback) {
+    client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
+        return callback(err, user)
+    });
+}
 
 function newAdd(data, callback1) {
     let id = uuid();
