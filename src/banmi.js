@@ -6,7 +6,7 @@ var bans = {};
 var MAX_ATTEMPTS = 3;
 var BAN_LENGTH = 3;
 
-function newBan() {
+function newBan(){
   return {
     attempts: 1,
     banTime: new Date()
@@ -22,7 +22,7 @@ function getBan(user){
   return bans[key(user)];
 }
 
-function resetBan(user){
+function createResetBan(user){
   bans[key(user)] = newBan();
 }
 
@@ -34,25 +34,25 @@ function incrementAttempts(user){
   bans[key(user)].attempts++;
 }
 
-module.exports.checkBan = function(user) {
+function isBanned(user){
   if(!getBan(user)) {
-		bans[key(user)] = newBan();
-    return true;
+		createResetBan(user);
+    return false;
 	}
   
-  if (banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) >= BAN_LENGTH){
-    resetBan(user);
-    return true;
+  if(banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) >= BAN_LENGTH){
+    createResetBan(user);
+    return false;
   }
   
-  if (banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) < BAN_LENGTH){
+  if(banAttempts(user) >= MAX_ATTEMPTS && getBanTimeElapsed(user) < BAN_LENGTH){
     incrementAttempts(user);
-		return false;
+		return true;
 	}
   
 	incrementAttempts(user);
-};
+}
 
-module.exports.banlist = banlist;
 module.exports.max_attempts = MAX_ATTEMPTS;
 module.exports.ban_length = BAN_LENGTH;
+module.exports.isBanned = isBanned;
