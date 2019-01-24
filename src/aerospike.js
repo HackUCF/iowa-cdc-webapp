@@ -60,6 +60,8 @@ function getUpstream(callback) {
                 if (error) {
                     logger.error(error)
                 } else {
+                    // Can we possibly change this to work on request status code?
+                    // I feel like this isn't a great way to distinguish errors
                     if (!JSON.stringify(body).toLowerCase().includes("internal server error")) {
                         logger.info(JSON.stringify(body, null, 4));
                         let key = new Aerospike.Key(settings.db_namespace, 'accounts', record.bins.account_number);
@@ -183,39 +185,43 @@ module.exports.test = function () {
         });
 };
 
-function addUser(uname, pass, callback) {
-    let key = new Aerospike.Key(settings.db_namespace, "users", uname);
-    client.put(key, {
-        uname: uname,
-        pass: pass
-    }).then(record => {
-        callback(record)
-    }).catch(error => logger.error(error))
-}
+// TODO Add passport.js hooks for db auth of users.
+//      As a result, the following should be deprecated
 
-module.exports.addUser = addUser;
+// function addUser(uname, pass, callback) {
+//     let key = new Aerospike.Key(settings.db_namespace, "users", uname);
+//     client.put(key, {
+//         uname: uname,
+//         pass: pass
+//     }).then(record => {
+//         callback(record)
+//     }).catch(error => logger.error(error))
+// }
 
-function getUser(uname, callback) {
-    client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
-        if (error) {
-            switch (error.code) {
-                case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-                    addUser(uname, "cdc", function () {
-                        getUser(uname, function (res) {
-                            callback(res)
-                        })
-                    });
-                    break;
-                default:
-                    console.log('ERR - ', error, key)
-            }
-        } else {
-            callback(record)
-        }
-    })
-}
+// // Why is this separate? Why not export the original function?
+// module.exports.addUser = addUser;
 
-module.exports.getUser = getUser;
+// function getUser(uname, callback) {
+//     client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
+//         if (error) {
+//             switch (error.code) {
+//                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
+//                     addUser(uname, "cdc", function () {
+//                         getUser(uname, function (res) {
+//                             callback(res)
+//                         })
+//                     });
+//                     break;
+//                 default:
+//                     console.log('ERR - ', error, key)
+//             }
+//         } else {
+//             callback(record)
+//         }
+//     })
+// }
+
+// module.exports.getUser = getUser;
 
 module.exports.delete_acct = function (account_number, callback) {
     let key = new Aerospike.Key(settings.db_namespace, 'accounts', account_number.toString())
@@ -226,7 +232,9 @@ module.exports.delete_acct = function (account_number, callback) {
     })
 };
 
-
+// TODO Figure out how to work this in with passport
+//      When we make a new user with passport, we also
+//      have to create a new bank account with the bank
 module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 0, callback) {
     this.checkconn();
     request.post({
@@ -334,6 +342,7 @@ module.exports.truncate = function (req, res, next) {
 };
 
 
+// TODO Uh.. That's not a great callback. What is this used for?
 function add(data, callback) {
     // let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number);
     let key = new Aerospike.Key(settings.db_namespace, "accounts", data.account_number.toString());
@@ -346,6 +355,26 @@ function add(data, callback) {
     }).catch(e => {
         logger.error(JSON.stringify(e, null, 4))
     })
+}
+
+
+module.exports.authenticate = function (username, password, done) {
+    client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
+        //If DB Error
+        if (err) {
+            return done(err);
+        }
+        // If use does not exist / User not found
+        if (!user) {
+            return done(null, false);
+        }
+        // If invalid password
+        if (user.password != password) {
+            return done(null, false);
+        }
+        // Else user is good to go. Authenticated
+        return done(null, user);
+    });
 }
 
 
@@ -418,6 +447,7 @@ module.exports.addComment = function (callback, set = "propaganda", bins) {
     })
 };
 
+// We can call this prior to competition.
 module.exports.precomp = function () {
     client.truncate(settings.db_namespace, 'accounts', function () {
         client.truncate(settings.db_namespace, 'adds', function () {

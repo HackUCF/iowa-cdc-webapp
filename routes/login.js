@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var passport = require('passport')
 let as = require('../src/aerospike');
 
 var Recaptcha = require('express-recaptcha').Recaptcha;
@@ -13,7 +14,7 @@ router.get('/', function (req, res, next) {
     }
 });
 
-router.post('/', recaptcha.middleware.verify, function (req, res, next) {
+router.post('/', recaptcha.middleware.verify, passport.authenticate('local', {failureRedirect: '/login'}), function (req, res, next) {
   recaptcha.verify(req, function(error, data){
     if (!req.recaptcha.error) {
       as.getUser(req.body.uname, function (result) {
