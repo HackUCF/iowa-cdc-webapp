@@ -4,13 +4,12 @@ var passport = require('passport')
 let as = require('../src/aerospike');
 
 
-router.get('/', function (req, res, next) {
 router.get('/', passport.authenticate('local', { failureRedirect: '/login' }),
-    function (req, res, next) {
-        res.render("admin.html", {settings:settings})
-        res.render("admin.html", {settings: settings});
-    }
+  function (req, res, next) {
+      res.render("admin.html", {settings:settings})
+      res.render("admin.html", {settings: settings});
 });
+
 router.get('/newAccount', function (req, res, next) {
     res.render('newAccount.html', {settings: settings})
 });

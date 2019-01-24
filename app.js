@@ -59,7 +59,10 @@ passport.serializeUser(function(user, cb) {
   
   passport.deserializeUser(function(id, cb) {
     db.users.findById(id, function (err, user) {
-      if (err) { return cb(err); }
+      if (err) {
+        logger.error("Encountered an error while processing login for user " + id + " at [" + new Date().toISOString() + "]");
+        return cb(err);
+      }
       cb(null, user);
     });
   });

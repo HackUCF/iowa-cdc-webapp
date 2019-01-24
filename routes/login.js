@@ -14,20 +14,16 @@ router.get('/', function (req, res, next) {
     }
 });
 
-router.post('/', recaptcha.middleware.verify, passport.authenticate('local', {failureRedirect: '/login'}), function (req, res, next) {
+router.post('/', passport.authenticate('local', {failureRedirect: '/'}), function (req, res, next) {
   recaptcha.verify(req, function(error, data){
     if (!req.recaptcha.error) {
-      as.getUser(req.body.uname, function (result) {
-          if (result.bins.pass == req.body.pass) {
-              res.cookie("logged_in", true);
-              req.cookies.logged_in = true;
-              res.redirect('/admin')
-          } else {
-              res.render('login.html', {settings: settings, failed: true})
-          }
-      });
+        logger.info("User " + req.body.uname + " successfully logged in and completed the captcha at [" + new Date().toISOString() + "]");
+        res.cookie("logged_in", true);
+        req.cookies.logged_in = true;
+        res.redirect('/admin');
     } else {
-    res.render('login.html', {settings: settings, failed: true});
+      logger.error("Login attempt for " + req.body.uname + " stopped due to invalid captcha [" + new Date().toISOString() + "]");
+      res.render('login.html', {settings: settings, failed: true});
     }
   });
 });

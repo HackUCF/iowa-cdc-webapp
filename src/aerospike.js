@@ -362,17 +362,21 @@ module.exports.authenticate = function (username, password, done) {
     client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
         //If DB Error
         if (err) {
+            logger.error("Encountered a DATABASE error while processing login for user " + username + " at [" + new Date().toISOString() + "]");
             return done(err);
         }
         // If use does not exist / User not found
         if (!user) {
+            logger.error("Nonexistent user " + id + " attempted to log in at [" + new Date().toISOString() + "]");
             return done(null, false);
         }
         // If invalid password
         if (user.password != password) {
+            logger.error("Invalid password for " + id + " at [" + new Date().toISOString() + "]");
             return done(null, false);
         }
         // Else user is good to go. Authenticated
+        logger.info("Successful login for " + id + " at [" + new Date().toISOString() + "]");
         return done(null, user);
     });
 }
