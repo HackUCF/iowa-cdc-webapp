@@ -1,12 +1,13 @@
-var path = require('path');
-var express = require('express');
-let fs = require('fs');
-const nunjucks = require("nunjucks");
-var path = require('path');
+var path         = require('path');
+var express      = require('express');
+let fs           = require('fs');
+const nunjucks   = require("nunjucks");
+var path         = require('path');
 var cookieParser = require('cookie-parser');
-var createError = require('http-errors');
-let winston = require('winston');
-var app_logger = require('morgan');
+var createError  = require('http-errors');
+let winston      = require('winston');
+var app_logger   = require('morgan');
+var passport     = require('passport');
 
 global.settings = require('./settings');
 global.as_settings = require('./as_settings');
@@ -19,12 +20,12 @@ global.logger = winston.createLogger({
     ]
 });
 
-var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'}); //TODO this needs pointed to /var/log
+var logStream = fs.createWriteStream(path.join(__dirname, 'logs/access.log'), {flags: 'a'});
 var lm = {};
 lm.phrase = function(){return "";};
 settings.lm = lm;
 
-let as = require('./src/aerospike');
+var as = require('./src/aerospike');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let search_router = require('./routes/search');
@@ -41,37 +42,10 @@ let njenv = new nunjucks.Environment(new nunjucks.FileSystemLoader('views', {wat
 });
 njenv.addGlobal("settings", settings).express(app);
 
-// PassportJS Local Auth
-var passport = require('passport');
-var Strategy = require('passport-local').Strategy;
-
-passport.use(new Strategy(as.authenticate));
-
-// Configure Passport authenticated session persistence.
-//
-// In order to restore authentication state across HTTP requests, Passport needs
-// to serialize users into and deserialize users out of the session.  The
-// typical implementation of this is as simple as supplying the user ID when
-// serializing, and querying the user record by ID from the database when
-// deserializing.
-passport.serializeUser(function(user, cb) {
-    cb(null, user.id);
-  });
-  
-  passport.deserializeUser(function(id, cb) {
-    db.users.findById(id, function (err, user) {
-      if (err) {
-        logger.error("Encountered an error while processing login for user " + id + " at [" + new Date().toISOString() + "]");
-        return cb(err);
-      }
-      cb(null, user);
-    });
-  });
-
 // Initialize Passport and restore authentication state, if any, from the
 // session.
 app.use(passport.initialize());
-app.use(passport.session());
+require('./src/passport')
 app.use(flash());
 
 app.use(app_logger('common', {
@@ -83,6 +57,7 @@ app.use(express.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+
 app.use(init);
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', indexRouter);
@@ -90,13 +65,13 @@ app.use('/search', search_router.search());
 app.use('/users', usersRouter);
 app.use('/api', api_router);
 app.use('/test', require('./routes/test'));
-app.use('/admin', require("./routes/admin"));
+app.use('/admin', passport.authenticate('jwt', {session: false}), require("./routes/admin"));
 app.use('/login', require("./routes/login"));
 app.use('/careers', require("./routes/now_hiring"));
-app.use('/schedule', require('./routes/sched'));
-app.use('/account', require('./routes/account'));
+app.use('/schedule', passport.authenticate('jwt', {session: false}), require('./routes/sched'));
+app.use('/account', passport.authenticate('jwt', {session: false}), require('./routes/account'));
 app.use('/about', require('./routes/about'));
-app.use('/settings', require('./routes/settings'));
+app.use('/settings', passport.authenticate('jwt', {session: false}), require('./routes/settings'));
 app.use('/truncate', as.truncate);
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({

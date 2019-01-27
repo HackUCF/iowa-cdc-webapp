@@ -1,8 +1,7 @@
 const Aerospike = require('aerospike');
-const uuid = require('uuid/v4');
-let randomItem = require('random-item');
-let request = require('request');
-let httpe = require('http-errors');
+const uuid      = require('uuid/v4');
+let request     = require('request');
+let httpe       = require('http-errors');
 
 const config = as_settings;
 let policies = {
@@ -11,6 +10,7 @@ let policies = {
         exists: Aerospike.policy.exists.IGNORE
     })
 };
+
 config.policies = policies;
 var client = new Aerospike.client(config);
 client.captureStackTraces = true;
@@ -185,44 +185,6 @@ module.exports.test = function () {
         });
 };
 
-// TODO Add passport.js hooks for db auth of users.
-//      As a result, the following should be deprecated
-
-// function addUser(uname, pass, callback) {
-//     let key = new Aerospike.Key(settings.db_namespace, "users", uname);
-//     client.put(key, {
-//         uname: uname,
-//         pass: pass
-//     }).then(record => {
-//         callback(record)
-//     }).catch(error => logger.error(error))
-// }
-
-// // Why is this separate? Why not export the original function?
-// module.exports.addUser = addUser;
-
-// function getUser(uname, callback) {
-//     client.get(new Aerospike.Key(settings.db_namespace, "users", uname), function (error, record) {
-//         if (error) {
-//             switch (error.code) {
-//                 case Aerospike.status.AEROSPIKE_ERR_RECORD_NOT_FOUND:
-//                     addUser(uname, "cdc", function () {
-//                         getUser(uname, function (res) {
-//                             callback(res)
-//                         })
-//                     });
-//                     break;
-//                 default:
-//                     console.log('ERR - ', error, key)
-//             }
-//         } else {
-//             callback(record)
-//         }
-//     })
-// }
-
-// module.exports.getUser = getUser;
-
 module.exports.delete_acct = function (account_number, callback) {
     let key = new Aerospike.Key(settings.db_namespace, 'accounts', account_number.toString())
     client.remove(key, function (err, key) {
@@ -357,30 +319,6 @@ function add(data, callback) {
     })
 }
 
-
-module.exports.authenticate = function (username, password, done) {
-    client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
-        //If DB Error
-        if (err) {
-            logger.error("Encountered a DATABASE error while processing login for user " + username + " at [" + new Date().toISOString() + "]");
-            return done(err);
-        }
-        // If use does not exist / User not found
-        if (!user) {
-            logger.error("Nonexistent user " + id + " attempted to log in at [" + new Date().toISOString() + "]");
-            return done(null, false);
-        }
-        // If invalid password
-        if (user['bins'].b != password) {
-            logger.error("Invalid password for " + id + " at [" + new Date().toISOString() + "]");
-            return done(null, false);
-        }
-        // Else user is good to go. Authenticated
-        logger.info("Successful login for " + id + " at [" + new Date().toISOString() + "]");
-        return done(null, user);
-    });
-}
-
 module.exports.getUser = function (username, callback) {
     client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
         return callback(err, user)
@@ -403,7 +341,6 @@ function newAdd(data, callback1) {
     })
 }
 
-
 module.exports.getAccount = function (account_number = 0, callback) {
     let key = new Aerospike.Key(settings.db_namespace, "accounts", account_number);
     logger.debug(JSON.stringify(key, null, 4))
@@ -416,7 +353,6 @@ module.exports.getAccount = function (account_number = 0, callback) {
         }
     })
 };
-
 
 module.exports.getAllAccounts = function (callback) {
     let all = {};
