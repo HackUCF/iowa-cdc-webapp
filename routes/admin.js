@@ -33,9 +33,11 @@ router.post('/add', function (req, res, next) {
         }
     })
 });
+
 router.get('/transfer', function (req, res, next) {
     res.render('transfer.html', {settings: settings})
 });
+
 router.post('/transfer', function (req, res, next) {
     req.body.destination = {account_number: req.body.dacct, branch: req.body.dbranch};
     as.addTransaction("transfer", req.body, function (err, result) {
@@ -46,6 +48,7 @@ router.post('/transfer', function (req, res, next) {
         }
     })
 });
+
 router.get('/picker', function (req, res, next) {
     res.render('account_picker.html', {settings: settings})
 })
