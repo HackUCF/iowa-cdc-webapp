@@ -444,7 +444,7 @@ module.exports.getComments = function (callback, set = "propaganda") {
         callback(null, all)
     });
     stream.on('data', record => {
-        all.push(record)
+        all.push({"set":record.bins.set, "uname":record.bins.uname, "comment":record.bins.comment});
     })
 };
 
