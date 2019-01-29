@@ -15,7 +15,7 @@ var opts = {}
 
 
 passport.serializeUser((user, done) => {
-    done(null, (String)(user['bins'].a))
+    done(null, (String)(user['bins'].username))
 })
 
 passport.deserializeUser((id, done) => {
@@ -26,7 +26,7 @@ passport.deserializeUser((id, done) => {
 
 passport.use(new JWTStrategy({
     secretOrKey: '5258ed9cb5d3e2d9daf8139df9880eba',
-    jwtFromRequest: req => req.cookies.auth_token,
+    jwtFromRequest: req => req.cookies['auth_token'],
 },
     function (jwtPayload, cb) {
         console.table(jwtPayload)
@@ -51,8 +51,7 @@ passport.use(new LocalStrategy({
             if(err){
                 done(err)
             }
-            if (!user || user['bins'].b != password) {
-                console.table(user)
+            if (!user || user['bins'] === undefined || user['bins'].username === undefined || user['bins'].password != password) {
                 return done(null, false, {message: 'Incorrect username or password.'});
             }
             return done(null, user, {message: 'Logged In Successfully'});
