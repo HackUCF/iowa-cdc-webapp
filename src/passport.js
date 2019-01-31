@@ -25,7 +25,7 @@ passport.deserializeUser((id, done) => {
 })
 
 passport.use(new JWTStrategy({
-    secretOrKey: '5258ed9cb5d3e2d9daf8139df9880eba',
+    secretOrKey: 'wHiTmAn_HaV3_a_H4l_Da1!_REEEE_5258ed9cb5d3e2d9daf8139df9880eba',
     jwtFromRequest: req => req.cookies['auth_token'],
 },
     function (jwtPayload, cb) {
