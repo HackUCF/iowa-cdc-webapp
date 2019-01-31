@@ -320,9 +320,19 @@ function add(data, callback) {
 }
 
 module.exports.getUser = function (username, callback) {
-    client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
-        return callback(err, user)
-    });
+  client.exists(new Aerospike.Key(settings.db_namespace, "users", username), function (error, result) {
+    if (error) {
+      logger.error("Error while checking for user: " + username);
+      callback(error, null);
+    } else if (result) {
+      return client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
+          return callback(err, user)
+      });
+    } else {
+       logger.error("Nonexistent user attempted to log in: " + username);
+       callback(error, null);
+    }
+  });
 }
 
 function newAdd(data, callback1) {
