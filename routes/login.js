@@ -19,27 +19,12 @@ router.get('/', function (req, res, next) {
     }
 });
 
-router.post('/', function (req, res) {
+router.post('/', function (req, res, next) {
     passport.authenticate('local', {session: false}, (err,user,info) => {
-    //   recaptcha.verify(req, function(error, data) {
-    //       if (!req.recaptcha.error) {
-            req.login(user, {session: false}, (err) => {
-                if(user == undefined || user == false){
-                    res.redirect('/login')
-                }
-                logger.info("User " + req.body.uname + " successfully logged in and completed the captcha at [" + new Date().toISOString() + "]");
-                var token = jwt.sign({'sub': user['bins'].username}, 'wHiTmAn_HaV3_a_H4l_Da1!_REEEE_5258ed9cb5d3e2d9daf8139df9880eba');
-                res.cookie('auth_token', token, { maxAge: 1000000 });
-                res.redirect('/')
-            });
-        //   } else {
-            // logger.error("Login attempt for " + req.body.uname + " stopped due to invalid captcha [" + new Date().toISOString() + "]");
-            // res.render('login.html', {
-            //     settings: settings,
-            //     failed: true
-            // });
-        //   }
-    //   });
+        console.log(info)
+        if(err) { return next(err); }
+        if (!user) { return res.redirect('/login')}
+        return req.login(user,next)
     })
     (req,res);
 });
