@@ -4,9 +4,7 @@ const jwt = require('jsonwebtoken');
 var passport = require('passport')
 
 var Recaptcha = require('express-recaptcha').Recaptcha;
-recaptcha = new Recaptcha("6LeXUIwUAAAAAMDSKM4DsbEW7V0e05BcA7df1bv7", "6LeXUIwUAAAAAE-J4bfyCM9hw9M4o6a1McdWIGFd", {
-    'theme': 'dark'
-});
+recaptcha = new Recaptcha(env.CAPTCHA_SITE, env.CAPTCHA_SECRET, {'theme': 'dark'});
 
 router.get('/', function (req, res, next) {
     if (req.isAuthenticated()) {
@@ -25,8 +23,7 @@ router.post('/', function (req, res, next) {
         if(err) { return next(err); }
         if (!user) { return res.redirect('/login')}
         return req.login(user,next)
-    })
-    (req,res);
+    })(req,res);
 });
 
 module.exports = router;

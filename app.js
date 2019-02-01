@@ -10,6 +10,7 @@ var app_logger   = require('morgan');
 var passport     = require('passport');
 
 global.settings = require('./settings');
+global.env = process.env;
 global.as_settings = require('./as_settings');
 global.logger = winston.createLogger({
     level: 'silly',

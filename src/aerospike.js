@@ -49,7 +49,7 @@ function getUpstream(callback) {
         });
         stream.on('data', record => {
             request.get({
-                uri: '/read.cgi',
+                uri: settings.P9_2_json.proto + '://' + env.B2N_SERVICE_AUTH + '@' + settings.P9_2_json.ip + ':' + settings.P9_2_json.port + env.B2N_SERVICE_PATH + '/read.cgi',
                 baseUrl: settings.P9_2_json.ip,
                 useQuerystring: true,
                 qs: {
@@ -97,7 +97,7 @@ function doTransfers() {
         let bins = record.bins;
         logger.debug(JSON.stringify(bins))
         request.post({
-            uri: '/transaction.cgi',
+            uri: settings.P9_2_json.proto + '://' + env.B2N_SERVICE_AUTH + '@' + settings.P9_2_json.ip + ':' + settings.P9_2_json.port + env.B2N_SERVICE_PATH + '/transaction.cgi',
             baseUrl: settings.P9_2_json.ip,
             useQuerystring: true,
             qs: {
@@ -201,7 +201,7 @@ module.exports.newAccount = function (acount_number = 0, owner, bal, pin = 0, ca
     this.checkconn();
     request.post({
         baseUrl: settings.P9_2_json.ip,
-        uri: '/acct.cgi',
+        uri: settings.P9_2_json.proto + '://' + env.B2N_SERVICE_AUTH + '@' + settings.P9_2_json.ip + ':' + settings.P9_2_json.port + env.B2N_SERVICE_PATH  + '/acct.cgi',
         json: true,
         body: {
             bank: settings.team.toString(),
@@ -409,7 +409,7 @@ module.exports.precomp = function () {
             client.truncate(settings.db_namespace, 'transfers', function () {
                 request.get({
                     baseUrl: settings.P9_2_json.ip,
-                    uri: '/read.cgi',
+                    uri: settings.P9_2_json.proto + '://' + env.B2N_SERVICE_AUTH + '@' + settings.P9_2_json.ip + ':' + settings.P9_2_json.port + env.B2N_SERVICE_PATH + '/read.cgi',
                     qs: {
                         bank: settings.team.toString(),
                         acct: 'ALL'

@@ -8,7 +8,8 @@
   "flag": "FLAG_DATA_HERE",
   "db_namespace": "minimoira",
   "P9_2_json": {
-    "ip": "bankapi:bankapi-llamas-d8c928032ef6a13406925810a2618641@192.168.4.20:80/962b4e43adec8f0975c7e7edcb134faf",
-    "port": 80
+    "ip": "192.168.4.20",
+    "port": 80,
+    "proto": "http"
   }
 }

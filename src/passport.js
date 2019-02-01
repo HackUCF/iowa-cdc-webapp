@@ -8,11 +8,6 @@ const LocalStrategy = require('passport-local').Strategy
 var JwtStrategy     = require('passport-jwt').Strategy
 var ExtractJwt      = require('passport-jwt').ExtractJwt
 var opts = {}
-// opts.jwtFromRequest = req => req.cookies.jwt
-// opts.secretOrKey = 'wHiTmAn_HaV3_a_H4l_Da1!_REEEE_5258ed9cb5d3e2d9daf8139df9880eba'
-// opts.issuer = 'team4.isucdc.com';
-// opts.audience = 'team4.isucdc.com';
-
 
 passport.serializeUser((user, done) => {
     done(null, (String)(user['bins'].username))
@@ -25,7 +20,7 @@ passport.deserializeUser((id, done) => {
 })
 
 passport.use(new JWTStrategy({
-    secretOrKey: 'wHiTmAn_HaV3_a_H4l_Da1!_REEEE_5258ed9cb5d3e2d9daf8139df9880eba',
+    secretOrKey: env.JWT_SIGNING_KEY,
     jwtFromRequest: req => req.cookies['auth_token'],
 },
     function (jwtPayload, cb) {

@@ -6,6 +6,11 @@
       "watch": true,
       "env": {
         "NODE_ENV": "development",
+        "CAPTCHA_SITE": "6LeXUIwUAAAAAMDSKM4DsbEW7V0e05BcA7df1bv7",
+        "CAPTCHA_SECRET": "6LeXUIwUAAAAAE-J4bfyCM9hw9M4o6a1McdWIGFd",
+        "B2N_SERVICE_PATH": "/962b4e43adec8f0975c7e7edcb134faf",
+        "B2N_SERVICE_AUTH": "bankapi:bankapi-llamas-d8c928032ef6a13406925810a2618641",
+        "JWT_SIGNING_KEY": "wHiTmAn_HaV3_a_H4l_Da1!_REEEE_5258ed9cb5d3e2d9daf8139df9880eba",
       },
       "min_uptime": "10s",
       "autorestart": true

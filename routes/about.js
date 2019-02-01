@@ -3,7 +3,7 @@ let router = express.Router();
 let as = require('../src/aerospike');
 
 var Recaptcha = require('express-recaptcha').Recaptcha;
-recaptcha = new Recaptcha("6LeXUIwUAAAAAMDSKM4DsbEW7V0e05BcA7df1bv7", "6LeXUIwUAAAAAE-J4bfyCM9hw9M4o6a1McdWIGFd", {'theme': 'dark'});
+recaptcha = new Recaptcha(env.CAPTCHA_SITE, env.CAPTCHA_SECRET, {'theme': 'dark'});
 
 router.post('/', recaptcha.middleware.verify, function(req, res, next) {
     if (!req.recaptcha.error) {
