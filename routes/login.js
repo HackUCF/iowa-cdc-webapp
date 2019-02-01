@@ -12,8 +12,9 @@ router.get('/', function (req, res, next) {
     } else {
         res.render('login.html', {
             settings: settings,
-            captcha: recaptcha.render()
-        })
+            captcha: recaptcha.render(),
+            captcha_sitekey: env.CAPTCHA_SITE,
+        });
     }
 });
 

@@ -32,6 +32,7 @@ router.get('/:set?', function(req, res, next) {
             settings: settings,
             comments: comments,
             set: req.params.set,
+            captcha_sitekey: env.CAPTCHA_SITE,
             captcha: recaptcha.render(),
         });
     }, req.params.set);
