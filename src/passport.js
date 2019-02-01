@@ -1,10 +1,11 @@
-const passport      = require('passport')
-const as            = require('./aerospike')
-const passportJWT   = require("passport-jwt")
-const JWTStrategy   = passportJWT.Strategy
-const ExtractJWT    = passportJWT.ExtractJwt
-const LocalStrategy = require('passport-local').Strategy
-const crypto        = require('crypto')
+const passport      = require('passport');
+const as            = require('./aerospike');
+const passportJWT   = require("passport-jwt");
+const JWTStrategy   = passportJWT.Strategy;
+const ExtractJWT    = passportJWT.ExtractJwt;
+const LocalStrategy = require('passport-local').Strategy;
+const crypto        = require('crypto');
+const bcrypt        = require('bcrypt');
 
 var JwtStrategy     = require('passport-jwt').Strategy
 var ExtractJwt      = require('passport-jwt').ExtractJwt
@@ -37,12 +38,6 @@ passport.use(new JWTStrategy({
     }
 ));
 
-hash = (password) => {
-    crypto.pbkdf2('DONGS' + password,'', 400, 64, null, (err, derivedKey) => {
-        console.log(derivedKey.toString('hex'))
-    })
-}
-
 passport.use(new LocalStrategy({
         usernameField: 'uname',
         passwordField: 'pass'
@@ -53,10 +48,15 @@ passport.use(new LocalStrategy({
             if(err){
                 done(err)
             }
-            if (!user || user['bins'] === undefined || user['bins'].username === undefined || hash(password) != user['bins'].password) {
+            if (!user || user.bins === undefined || user.bins.username === undefined)
                 return done(null, false, {message: 'Incorrect username or password.'});
-            }
-            return done(null, user, {message: 'Logged In Successfully'});
-        })
+                
+            bcrypt.compare(env.PASSWORD_SALT + password, user.bins.password).then(function(res) {
+              if(res === true)
+                return done(null, user, {message: 'Logged In Successfully'});
+              else
+                return done(null, false, {message: 'Incorrect username or password.'});
+            });
+        });
     }
 ));
