@@ -1,0 +1,18 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<h2>Here is what I found comrade</h2>
+{% if results %}
+<ul>
+    {% for result in results %}
+    <li><a href="{{result.link}}">{{result.text}}</a></li>
+    {% endfor %}
+</ul>
+{% elif search %}
+<script>console.log(JSON.stringify(search, null, 4))</script>
+<h3>{{search.search}}</h3>
+<p style="color: #1c7430">{{search.result}}</p>
+<p style="color: #dc3545">{{search.error}}</p>
+{% else %}
+    <p>Nothing. Perhaps you should ask a party officer, da?</p>
+{% endif %}
+{% endblock %}

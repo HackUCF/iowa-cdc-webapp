@@ -1,0 +1,9 @@
+{
+  "account_number": 123,
+  "amount": 175,
+  "pin": 1234,
+  "destination": {
+    "account_number": 1234,
+    "branch": 40
+  }
+}

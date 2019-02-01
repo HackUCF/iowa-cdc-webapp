@@ -1,0 +1,13 @@
+{% extends "skeleton.html" %}
+{% block body %}
+<div style="alignment: center">
+<img src="/assets/Animated-Flag-USSR.gif" alt="The glorious flag of the Party" align="center" style="alignment: center; display: block;margin: auto">
+</div>
+<div>
+    <h1 style="text-align: center">Добро пожаловать, товарищ!</h1>
+</div>
+
+<p>Вы в настоящее время посещаете сайт филиала {{settings.team}}!</p>
+<p>Здесь, в {{settings.strings.bank_name | default('The bank of Red Team')}}, мы стремимся быстро перевести деньги! Таким образом, капиталисты не могут угнаться за матушкой Россией!</p>
+<p>Конечно, это означает, что мы жертвуем небольшим количеством безопасности, но давайте будем честными, если бы мы были в безопасности, КГБ пришел бы за всеми нами!</p>
+{% endblock %}
