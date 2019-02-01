@@ -4,6 +4,7 @@ const passportJWT   = require("passport-jwt")
 const JWTStrategy   = passportJWT.Strategy
 const ExtractJWT    = passportJWT.ExtractJwt
 const LocalStrategy = require('passport-local').Strategy
+const crypto        = require('crypto')
 
 var JwtStrategy     = require('passport-jwt').Strategy
 var ExtractJwt      = require('passport-jwt').ExtractJwt
@@ -36,6 +37,12 @@ passport.use(new JWTStrategy({
     }
 ));
 
+hash = (password) => {
+    crypto.pbkdf2('DONGS' + password,'', 400, 64, null, (err, derivedKey) => {
+        console.log(derivedKey.toString('hex'))
+    })
+}
+
 passport.use(new LocalStrategy({
         usernameField: 'uname',
         passwordField: 'pass'
@@ -46,7 +53,7 @@ passport.use(new LocalStrategy({
             if(err){
                 done(err)
             }
-            if (!user || user['bins'] === undefined || user['bins'].username === undefined || user['bins'].password != password) {
+            if (!user || user['bins'] === undefined || user['bins'].username === undefined || hash(password) != user['bins'].password) {
                 return done(null, false, {message: 'Incorrect username or password.'});
             }
             return done(null, user, {message: 'Logged In Successfully'});
