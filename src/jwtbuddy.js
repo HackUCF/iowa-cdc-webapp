@@ -41,11 +41,12 @@ var isValid = function(jwt, callback){
 			logger.error("Error checking JWT blacklist.");
 			callback(false);
 		}
-			
+		
 		if(inBlacklist){
 			logger.error("Attempted to validate a blacklisted JWT.");
 			callback(false);
 		}
+		
 		if(PRIVILEGE_LEVELS[decode(jwt).group] < 0){
 			logger.error("Attempted to validate JWT with less than minimal authorization.");
 			callback(false);

@@ -4,8 +4,7 @@ var passport = require('passport')
 let as = require('../src/aerospike');
 
 
-router.get('/', passport.authenticate('local', {errorRedirect: '/login'}),
-    function (req, res, next) {
+router.get('/', function (req, res, next) {
         res.render("admin.html", {settings: settings});
     }
 );
