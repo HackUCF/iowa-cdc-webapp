@@ -78,8 +78,7 @@ window.getCookie = function(name) {
   if (match) return match[2];
 }
 document.addEventListener("DOMContentLoaded", function(){
-  var session = getCookie("session");
-  if(typeof(session) !== undefined && session !== ""){
+  if(getCookie("session") == null){
     $("#login-logout").attr("href", "/logout");
     $("#login-logout").text("Log Out");
   } else {
