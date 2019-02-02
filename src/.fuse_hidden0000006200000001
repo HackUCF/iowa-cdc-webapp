@@ -1,4 +1,4 @@
-const jwtlib = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 var as = require('./aerospike');
 
 const PRIVILEGE_LEVELS = {
@@ -15,12 +15,12 @@ const LIFESPAN = 5 * 60 * 1000;
 module.exports.lifespan = LIFESPAN;
 
 module.exports.issue = function(username, group){
-	return jwtlib.sign({'sub': username, 'group': group}, env.JWT_SIGNING_KEY, options={expiresIn: LIFESPAN});
+	return jwt.sign({'sub': username, 'group': group}, env.JWT_SIGNING_KEY, options={expiresIn: LIFESPAN});
 };
 
 var decode = function(jwt){
 	try {
-		let decoded = jwtlib.verify(jwt, env.JWT_SIGNING_KEY);
+		let decoded = jwt.verify(jwt, env.JWT_SIGNING_KEY);
 		return decoded;
 	}
 	catch(err) {
@@ -71,12 +71,12 @@ module.exports.checkAuthorization = function(requiredLevel){
         if(req.cookies.session){
             isValid(req.cookies.session, function(validated){
                 if(validated && getPrivLevel(req.cookies.session) >= requiredLevel)
-                    return next();
+                    next();
                 else
                     res.status(401).end();
             })
         } else if (requiredLevel <= 0){
-            return next();
+            next();
         } else {
             res.status(401).end();
         }
