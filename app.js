@@ -8,6 +8,7 @@ var createError  = require('http-errors');
 let winston      = require('winston');
 var app_logger   = require('morgan');
 var passport     = require('passport');
+const buddy = require('../src/jwtbuddy');
 
 global.settings = require('./settings');
 global.env = process.env;
@@ -63,17 +64,19 @@ app.use(init);
 app.use(express.static(path.join(__dirname, '/public')));
 app.use('/', indexRouter);
 app.use('/search', search_router.search());
-app.use('/users', usersRouter);
 app.use('/api', api_router);
-app.use('/test', require('./routes/test'));
-app.use('/admin', passport.authenticate('jwt', {session: false}), require("./routes/admin"));
 app.use('/login', require("./routes/login"));
 app.use('/careers', require("./routes/now_hiring"));
-app.use('/schedule', passport.authenticate('jwt', {session: false}), require('./routes/sched'));
-app.use('/account', passport.authenticate('jwt', {session: false}), require('./routes/account'));
 app.use('/about', require('./routes/about'));
-app.use('/settings', passport.authenticate('jwt', {session: false}), require('./routes/settings'));
-app.use('/truncate', as.truncate);
+app.use('/admin', buddy.checkAuthorization(buddy.levels.financier), require("./routes/admin"));
+app.use('/account', buddy.checkAuthorization(buddy.levels.financier), require('./routes/account'));
+app.use('/users', buddy.checkAuthorization(buddy.levels.financier), usersRouter);
+app.use('/schedule', buddy.checkAuthorization(buddy.levels.developer), require('./routes/sched'));
+app.use('/settings', buddy.checkAuthorization(buddy.levels.developer), require('./routes/settings'));
+app.use('/test', buddy.checkAuthorization(buddy.levels.developer), require('./routes/test'));
+app.use('/logout', buddy.checkAuthorization(buddy.levels.logged_in), require('./routes/logout'));
+//app.use('/truncate', buddy.checkAuthorization(buddy.levels.admin), as.truncate);
+
 if (process.env.NODE_ENV !== 'production') {
     logger.add(new winston.transports.Console({
         format: winston.format.combine(winston.format.colorize(), winston.format.simple())
