@@ -401,10 +401,13 @@ module.exports.addComment = function (callback, set = "propaganda", bins) {
 
 module.exports.addBlacklistedJWT = function (jwt, callback) {
     let key = new Aerospike.Key(settings.db_namespace, "jwt_blacklist", uuid());
-    client.put(key, {token: jwt}, function (error, key) {
+    const policy = new Aerospike.WritePolicy({
+         exists: Aerospike.policy.exists.CREATE_OR_REPLACE
+    });
+   client.put(key, {token: jwt}, policy, function (error, key) {
         if(error)
           logger.error("Error while blacklisting a JWT");
-          
+
         callback(error);
     })
 };
@@ -415,7 +418,8 @@ module.exports.checkJWTBlacklist = function(jwt, callback) {
       logger.error("Error while checking JWT blacklist");
       callback(error, null);
     } else if (result) {
-     return callback(error, true)
+      logger.error("Blacklisted JWT encountered in checkJWTBlacklist");
+      return callback(error, true)
     } else {
        callback(error, false);
     }
