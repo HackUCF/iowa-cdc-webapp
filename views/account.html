@@ -9,6 +9,6 @@
     <button class="btn btn-primary" type="submit">Update</button>
 </form>
 <form action="/account/del/{{account.account_number}}" method="post">
-    <input type="submit" name="upvote" value="Push me for a good time!l" class="btn btn-danger" />
+    <input type="submit" name="upvote" onsubmit="return confirm('Do you really want to delete {{account.owner}}\'s account?');" value="Delete Account" class="btn btn-danger" />
 </form>
 {% endblock %}
