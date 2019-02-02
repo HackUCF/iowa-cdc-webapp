@@ -10,9 +10,11 @@
     <div class="form-group">
         <input class="form-control" type="password" placeholder="Password" name="pass">
     </div>
+{% if show_captcha %}
     <div class="form-group">
       <div class="g-recaptcha" data-sitekey="{{ captcha_sitekey }}"></div>
     </div>
+{% endif %}
     <div class="form-group">
         <button class="btn btn-lg btn-primary" type="submit">Login</button>
     </div>
