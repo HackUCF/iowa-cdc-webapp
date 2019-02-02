@@ -78,7 +78,7 @@ window.getCookie = function(name) {
   if (match) return match[2];
 }
 document.addEventListener("DOMContentLoaded", function(){
-  if(getCookie("session") == null){
+  if(getCookie("session") != null){
     $("#login-logout").attr("href", "/logout");
     $("#login-logout").text("Log Out");
   } else {
