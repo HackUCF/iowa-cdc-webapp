@@ -27,7 +27,7 @@ passport.use(new LocalStrategy({
         clientAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         return as.getUser(username, (err, user) => {
             if(err){
-                logger.error("Passport: couldnt get user: " + username + " due to aerospike error: " + error);
+                banmi.recordFailure(clientAddr);
                 done(err)
             }
             if (!user || user.bins === undefined || user.bins.username === undefined){

@@ -23,9 +23,9 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    clientAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    isBanned = banmi.isBanned(clientAddr);
-    
+  clientAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  isBanned = banmi.isBanned(clientAddr);
+
     if(isBanned){
       logger.info("Login attempt for " + req.body.uname + " will presented with a captcha [" + new Date().toISOString() + "] IP: " + clientAddr + " numFailures: " + banmi.numFailuresRecorded(clientAddr));
       recaptcha.verify(req, function(error, data){
