@@ -5,16 +5,20 @@
 
 var Banmi = {};
 
-// Defaults: Max of 3 attempts, with a 5 second cool-down period
-Banmi.maxAttempts = 3;
-Banmi.banLength = 5;
+// Initial ban length, which is used to calculate the scaling ban length per
+// the total number of failed attempts
+Banmi.initialBanLength = 120;
+
+// Maximum failure threshold that login attempts cannot exceed.
+Banmi.maxFailThreshold = 3;
 
 Banmi.bans = {};
 
 Banmi.createBanRecord = function(user){
   this.bans[user] = {
-    attempts: 0,
-    lastFailTime: new Date()
+    numFailuresRecorded: 0,
+    initialBanTime: new Date(),
+    lastFailTime: new Date(),
   };
 };
 
@@ -26,19 +30,19 @@ Banmi.banRecordExists = function(user){
   return this.bans[user];
 };
 
-Banmi.numAttemptsRecorded = function(user){
+Banmi.numFailuresRecorded = function(user){
   if(!this.banRecordExists(user))
     return 0;
 
-  return this.bans[user].attempts;
+  return this.bans[user].numFailuresRecorded;
 };
 
-Banmi.banTimeElapsed = function(user){
+Banmi.banTimeRemaining = function(user){
   if(!this.banRecordExists(user))
     return 0;
     
   currentTime = new Date();
-  return Math.floor((currentTime - this.bans[user].lastFailTime) / 1000);
+  return this.bans[user].expireTime - currentTime;
 };
 
 Banmi.recordFailure = function(user){
@@ -46,14 +50,18 @@ Banmi.recordFailure = function(user){
     this.createBanRecord(user);
   
   this.bans[user].lastFailTime = new Date();
-  this.bans[user].attempts++;
+  this.bans[user].numFailuresRecorded++;
+  
+  currentTime = new Date();
+  this.bans[user].expireTime = currentTime.setSeconds(currentTime.getSeconds() +
+    (Math.floor(this.bans[user].numFailuresRecorded / this.maxFailThreshold) * this.initialBanLength));
 };
 
 Banmi.isBanned = function(user){
-  if(this.banTimeElapsed(user) >= this.banLength)
+  if(this.banTimeRemaining(user) <= 0)
     this.deleteBanRecord(user);
   
-  if(this.numAttemptsRecorded(user) >= this.maxAttempts)
+  if(this.numFailuresRecorded(user) >= this.maxFailThreshold)
     return true;
   
   return false;
