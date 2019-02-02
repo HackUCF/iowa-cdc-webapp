@@ -84,10 +84,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.use(function (req, res, next) {
+    if (res.headersSent)
+        return;
+        
     next(createError(404));
 });
 
 app.use(function (err, req, res, next) {
+    if (res.headersSent)
+        return;
+        
     res.locals.message = err.message;
     res.locals.error = err;
     logger.error(err);

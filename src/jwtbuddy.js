@@ -12,6 +12,8 @@ const PRIVILEGE_LEVELS = {
 module.exports.levels = PRIVILEGE_LEVELS;
 
 const LIFESPAN = 5 * 60 * 1000;
+module.exports.lifespan = LIFESPAN;
+
 module.exports.issue = function(username, group){
 	return jwt.sign({'sub': username, 'group': group}, env.JWT_SIGNING_KEY, options={expiresIn: LIFESPAN});
 };
@@ -52,18 +54,24 @@ var getPrivLevel = function(jwt) {
 };
 
 module.exports.checkAuthorization = function(requiredLevel){
-	return function(req, res, next){
-		if(req.cookies.session){
-			isValid(req.cookies.session, function(validated){
-				if(validated && getPrivLevel(req.cookies.session) >= requiredLevel)
-					next();
-				else
-					res.sendStatus(403);
-			})
-		} else if (requiredLevel <= 0){
-			next();
-		} else {
-			res.send_status(403);
-		}
-	}
+    return function(req, res, next){
+        if(req.cookies.session){
+            isValid(req.cookies.session, function(validated){
+                if(validated && getPrivLevel(req.cookies.session) >= requiredLevel)
+                    next();
+                else
+                    res.statusCode = 401;
+										res.write('{"error": "unauthorized"}');
+                    res.end();
+                    return;
+            })
+        } else if (requiredLevel <= 0){
+            next();
+        } else {
+            res.statusCode = 401;
+						res.write('{"error": "unauthorized"}');
+            res.end();
+            return;
+        }
+    }
 };
