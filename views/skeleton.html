@@ -32,7 +32,7 @@
                         <a class="nav-link" href="/about">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
+                        <a class="nav-link" id="login-logout" href="/login">Log In</a>
                     </li>
                 </ul>
                  <form class="form-inline mt-2 mt-md-0" action="/search" method="post" enctype="multipart/form-data">
@@ -72,6 +72,21 @@
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script>
+window.getCookie = function(name) {
+  var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  if (match) return match[2];
+}
+document.addEventListener("DOMContentLoaded", function(){
+  if(typeof(getCookie("session")) !== undefined && getCookie("session") !== ""){
+    $("#login-logout").attr("href", "/logout");
+    $("#login-logout").text("Log Out");
+  } else {
+    $("#login-logout").attr("href", "/login")
+    $("#login-logout").text("Log In");
+  }
+});
+</script>
 {% endblock %}
 </body>
 </html>
