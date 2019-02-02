@@ -10,7 +10,7 @@ var Banmi = {};
 Banmi.initialBanLength = 120;
 
 // Maximum failure threshold that login attempts cannot exceed.
-Banmi.maxFailThreshold = 3;
+Banmi.maxFailThreshold = 2;
 
 Banmi.bans = {};
 
