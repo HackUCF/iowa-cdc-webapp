@@ -23,7 +23,7 @@ router.post('/', function (req, res, next) {
         console.log(info)
         if(err) { return next(err); }
         if (!user) { return res.redirect('/login')}
-        res.cookies.session = buddy.issue(user.username, user.group);
+        res.cookie('session', buddy.issue(user.username, user.group), buddy.lifespan);
         res.redirect("/");
     })(req,res);
 });
