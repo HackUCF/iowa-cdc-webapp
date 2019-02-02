@@ -18,7 +18,7 @@ router.get("/balance", function (req, res, nexr) {
     as.getAllAccounts(function (err, all) {
         for (i of Object.keys(all)){
             s.balances.push({
-                balance: all[i].bins.amount,
+                balance: all[i].bins.balance,
                 account_number: i
             })
 
