@@ -22,6 +22,7 @@
   "dependencies": {
     "aerospike": "3.8.0",
     "array-unique": "^0.3.2",
+    "bcrypt": "^3.0.3",
     "bootstrap": "^4.2.1",
     "child_process": "^1.0.2",
     "cloudcmd": "^11.8.3",

@@ -71,12 +71,12 @@ module.exports.checkAuthorization = function(requiredLevel){
         if(req.cookies.session){
             isValid(req.cookies.session, function(validated){
                 if(validated && getPrivLevel(req.cookies.session) >= requiredLevel)
-                    next();
+                    return next();
                 else
                     res.status(401).end();
             })
         } else if (requiredLevel <= 0){
-            next();
+            return next();
         } else {
             res.status(401).end();
         }
