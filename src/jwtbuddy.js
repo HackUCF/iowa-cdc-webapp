@@ -36,15 +36,21 @@ module.exports.blacklist = function(jwt, callback){
 
 var isValid = function(jwt, callback){
 	as.checkJWTBlacklist(jwt, function(error, inBlacklist){
-		if(error)
+		if(error){
+			logger.error("Error checking JWT blacklist.");
 			callback(false);
+		}
 			
-		if(inBlacklist)
+		if(inBlacklist){
+			logger.error("Attempted to validate a blacklisted JWT.");
 			callback(false);
+		}
 		
-		if(decode(jwt).group == -1)
+		if(decode(jwt).group < 0){
+			logger.error("Attempted to validate JWT with less than minimal authorization.");
 			callback(false);
-	
+		}
+		
 		callback(true);
 	});
 };
