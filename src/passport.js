@@ -6,10 +6,12 @@ const bcrypt        = require('bcrypt');
 var opts = {}
 
 passport.serializeUser((user, done) => {
+    logger.error("Passport: call to serializeUser");
     done(null, (String)(user['bins'].username))
 })
 
 passport.deserializeUser((id, done) => {
+    logger.error("Passport: call to deserializeUser");
     as.getUser(id, (err, user) => {
         done(err, user)
     })
@@ -25,6 +27,7 @@ passport.use(new LocalStrategy({
         clientAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         return as.getUser(username, (err, user) => {
             if(err){
+                logger.error("Passport: couldnt get user: " + username + " due to aerospike error: " + error);
                 done(err)
             }
             if (!user || user.bins === undefined || user.bins.username === undefined){
