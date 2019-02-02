@@ -18,7 +18,7 @@ module.exports.issue = function(username, group){
 	return jwtlib.sign({'sub': username, 'group': group}, env.JWT_SIGNING_KEY, options={expiresIn: LIFESPAN});
 };
 
-var decode = function(jwt_input){
+var decode = function(jwt){
 	try {
 		let decoded = jwtlib.verify(jwt, env.JWT_SIGNING_KEY);
 		return decoded;
@@ -46,8 +46,7 @@ var isValid = function(jwt, callback){
 			logger.error("Attempted to validate a blacklisted JWT.");
 			callback(false);
 		}
-		
-		if(decode(jwt).group < 0){
+		if(PRIVILEGE_LEVELS[decode(jwt).group] < 0){
 			logger.error("Attempted to validate JWT with less than minimal authorization.");
 			callback(false);
 		}
