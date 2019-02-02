@@ -401,7 +401,7 @@ module.exports.addComment = function (callback, set = "propaganda", bins) {
 
 module.exports.addBlacklistedJWT = function (jwt, callback) {
     let key = new Aerospike.Key(settings.db_namespace, "jwt_blacklist", uuid());
-    client.put(key, jwt, function (error, key) {
+    client.put(key, {token: jwt}, function (error, key) {
         if(error)
           logger.error("Error while blacklisting a JWT");
           
