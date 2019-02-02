@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-let as = require('../src/aerospike');
+var as = require('./aerospike');
 
 const PRIVILEGE_LEVELS = {
 	"admin": 4,
@@ -26,7 +26,7 @@ var decode = function(jwt){
 	}
 };
 
-var blacklist = function(jwt, callback){
+module.exports.blacklist = function(jwt, callback){
 	as.addBlacklistedJWT(jwt, function(err){
 		callback(err);
 	});

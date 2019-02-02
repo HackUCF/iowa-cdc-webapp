@@ -8,7 +8,6 @@ var createError  = require('http-errors');
 let winston      = require('winston');
 var app_logger   = require('morgan');
 var passport     = require('passport');
-const buddy = require('../src/jwtbuddy');
 
 global.settings = require('./settings');
 global.env = process.env;
@@ -34,6 +33,7 @@ let search_router = require('./routes/search');
 let api_router = require("./routes/api");
 let init = require("./src/init_session");
 var flash = require('connect-flash');
+const buddy = require('./src/jwtbuddy');
 
 var app = express();
 
