@@ -24,6 +24,7 @@ var decode = function(jwt){
 		return decoded;
 	}
 	catch(err) {
+		logger.error("Error while validating JWT: " + err);
 		return {'sub': "", 'group': -1};
 	}
 };
@@ -55,9 +56,15 @@ var isValid = function(jwt, callback){
 	});
 };
 
+var getUserName = function(jwt) {
+	return decode(jwt).sub;
+};
+module.exports.getUserName = getUserName;
+
 var getPrivLevel = function(jwt) {
 	return PRIVILEGE_LEVELS[decode(jwt).group];
 };
+module.exports.getPrivLevel = getPrivLevel;
 
 module.exports.checkAuthorization = function(requiredLevel){
     return function(req, res, next){
