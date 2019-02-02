@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const jwt = require('jsonwebtoken');
+const buddy = require('../src/jwtbuddy');
 var passport = require('passport')
 
 var Recaptcha = require('express-recaptcha').Recaptcha;
@@ -23,7 +23,8 @@ router.post('/', function (req, res, next) {
         console.log(info)
         if(err) { return next(err); }
         if (!user) { return res.redirect('/login')}
-        return req.login(user,next)
+        res.cookies.session = buddy.issue(user.username, user.group);
+        res.redirect("/");
     })(req,res);
 });
 
