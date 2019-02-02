@@ -27,15 +27,13 @@ router.post('/num/:account_number', function (req, res, next) {
     })
 });
 router.get('/', function (req, res, next) {
-    /*as.getAllAccounts(function (err, all) {
+    as.getAllAccounts(function (err, all) {
         if(err){
             res.send(err);
         }else{
             res.json({all: all})
         }
-    })*/
-    
-    res.json({all: {}});
+    })
 });
 
 router.post('/del/:account_number', function (req, res, next) {
