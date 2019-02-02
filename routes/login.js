@@ -27,26 +27,28 @@ router.post('/', function (req, res, next) {
     isBanned = banmi.isBanned(clientAddr);
     
     if(isBanned){
+      logger.info("Login attempt for " + req.body.uname + " will presented with a captcha [" + new Date().toISOString() + "] IP: " + clientAddr + " numFailures: " + banmi.numFailuresRecorded(clientAddr));
       recaptcha.verify(req, function(error, data){
         if (!req.recaptcha.error) {
             passport.authenticate('local', {session: false}, (err,user,info) => {
                 if(err) { return next(err); }
                 if (!user) { return res.redirect('/login')};
-                logger.info("User " + user['bins'].username + " successfully logged in and completed the captcha at [" + new Date().toISOString() + "]");
+                logger.info("User " + user['bins'].username + " successfully logged in and completed the captcha at [" + new Date().toISOString() + "] IP: " + clientAddr);
                 res.cookie('session', buddy.issue(user['bins'].username, user['bins'].group), buddy.lifespan);
                 res.redirect("/");
             })(req,res);
         } else {
           banmi.recordFailure(clientAddr);
-          logger.error("Login attempt for " + req.body.uname + " stopped due to invalid captcha [" + new Date().toISOString() + "]");
+          logger.error("Login attempt for " + req.body.uname + " stopped due to invalid captcha [" + new Date().toISOString() + "] IP: " + clientAddr + " numFailures: " + banmi.numFailuresRecorded(clientAddr));
           res.render('login.html', {settings: settings, failed: true});
         }
       });
     } else {
+      logger.info("Login attempt for " + req.body.uname + " will not be presented with a captcha [" + new Date().toISOString() + "] IP: " + clientAddr + " numFailures: " + banmi.numFailuresRecorded(clientAddr));
       passport.authenticate('local', {session: false}, (err,user,info) => {
           if(err) { return next(err); }
           if (!user) { return res.redirect('/login')}
-          console.table(user)
+          logger.info("User " + user['bins'].username + " successfully logged in without a captcha solve at [" + new Date().toISOString() + "] IP: " + clientAddr);
           res.cookie('session', buddy.issue(user['bins'].username, user['bins'].group), buddy.lifespan);
           res.redirect("/");
       })(req,res);
