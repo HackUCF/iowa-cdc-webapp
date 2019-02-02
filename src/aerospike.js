@@ -326,7 +326,7 @@ module.exports.getUser = function (username, callback) {
       callback(error, null);
     } else if (result) {
       return client.get(new Aerospike.Key(settings.db_namespace, "users", username), (err, user) => {
-          return callback(err, user)
+          return callback(error, user)
       });
     } else {
        logger.error("Nonexistent user attempted to log in: " + username);
@@ -400,6 +400,29 @@ module.exports.addComment = function (callback, set = "propaganda", bins) {
     client.put(key, bins, function (error, key) {
         callback(error, key)
     })
+};
+
+module.exports.addBlacklistedJWT = function (jwt, callback) {
+    let key = new Aerospike.Key(settings.db_namespace, "jwt_blacklist", uuid());
+    client.put(key, jwt, function (error, key) {
+        if(error)
+          logger.error("Error while blacklisting a JWT");
+          
+        callback(error);
+    })
+};
+
+module.exports.checkJWTBlacklist = function(jwt, callback) {
+  client.exists(new Aerospike.Key(settings.db_namespace, "jwt_blacklist", jwt), function (error, result) {
+    if (error) {
+      logger.error("Error while checking JWT blacklist");
+      callback(error, null);
+    } else if (result) {
+     return callback(error, true)
+    } else {
+       callback(error, false);
+    }
+  });
 };
 
 // We can call this prior to competition.
