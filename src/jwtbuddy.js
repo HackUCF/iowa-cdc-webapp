@@ -60,18 +60,12 @@ module.exports.checkAuthorization = function(requiredLevel){
                 if(validated && getPrivLevel(req.cookies.session) >= requiredLevel)
                     next();
                 else
-                    res.statusCode = 401;
-										res.write('{"error": "unauthorized"}');
-                    res.end();
-                    return;
+                    res.status(401).send({status:401, message: 'unauthorized'});
             })
         } else if (requiredLevel <= 0){
             next();
         } else {
-            res.statusCode = 401;
-						res.write('{"error": "unauthorized"}');
-            res.end();
-            return;
+            res.status(401).send({status:401, message: 'unauthorized'});
         }
     }
 };
