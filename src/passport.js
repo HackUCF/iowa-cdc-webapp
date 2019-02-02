@@ -1,14 +1,8 @@
 const passport      = require('passport');
 const as            = require('./aerospike');
-const passportJWT   = require("passport-jwt");
-const JWTStrategy   = passportJWT.Strategy;
-const ExtractJWT    = passportJWT.ExtractJwt;
 const LocalStrategy = require('passport-local').Strategy;
 const crypto        = require('crypto');
 const bcrypt        = require('bcrypt');
-
-var JwtStrategy     = require('passport-jwt').Strategy
-var ExtractJwt      = require('passport-jwt').ExtractJwt
 var opts = {}
 
 passport.serializeUser((user, done) => {
@@ -20,23 +14,6 @@ passport.deserializeUser((id, done) => {
         done(err, user)
     })
 })
-
-passport.use(new JWTStrategy({
-    secretOrKey: env.JWT_SIGNING_KEY,
-    jwtFromRequest: req => req.cookies['auth_token'],
-},
-    function (jwtPayload, cb) {
-        console.table(jwtPayload)
-        //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
-        return as.getUser(jwtPayload.sub)
-            .then(user => {
-                return cb(null, user);
-            })
-            .catch(err => {
-                return cb(err);
-            });
-    }
-));
 
 passport.use(new LocalStrategy({
         usernameField: 'uname',
