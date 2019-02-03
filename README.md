@@ -13,7 +13,7 @@ Note that this application is not what you'd call "production-ready", in the sen
 
 ## Invocation
 
-The application accepts secrets (key material) in the form of environemt variables, as below:
+The application accepts secrets (key material) in the form of environment variables, as below:
 
 ```
  CAPTCHA_SITE='your recaptcha site key' CAPTCHA_SECRET='your recaptcha secret key' B2N_SERVICE_PATH='/some-secret-path' B2N_SERVICE_AUTH='username:password' JWT_SIGNING_KEY='some key' PASSWORD_SALT='some password salt' NO_PROXY='*' pm2 start ecosystem.json
